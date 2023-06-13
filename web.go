@@ -35,7 +35,7 @@ type PageContext struct {
 }
 
 func (p *PageContext) UrlFor(path string) string {
-	return p.s.c.getAppUrl() + "/" + path
+	return p.s.c.conf.getAppUrl() + "/" + path
 }
 
 func (s *WebService) HandleFunc(w http.ResponseWriter, r *http.Request) {

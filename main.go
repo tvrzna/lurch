@@ -2,13 +2,17 @@ package main
 
 import (
 	"net/http"
+	"os"
 )
 
 func main() {
-	c := NewContext(5000, "workdir")
+	conf := LoadConfig(os.Args)
+	c := NewContext(conf)
 
-	http.HandleFunc("/rest/", (&RestService{c: c}).HandleFunc)
-	http.HandleFunc("/", NewWebService(c).HandleFunc)
+	server := http.NewServeMux()
 
-	http.ListenAndServe(c.getServerUri(), nil)
+	server.HandleFunc("/rest/", (&RestService{c: c}).HandleFunc)
+	server.HandleFunc("/", NewWebService(c).HandleFunc)
+
+	http.ListenAndServe(c.conf.getServerUri(), server)
 }

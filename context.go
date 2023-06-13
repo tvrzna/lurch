@@ -15,34 +15,14 @@ import (
 )
 
 type Context struct {
-	mutex  *sync.Mutex
-	port   int
-	path   string
-	appUrl string
-	jobs   []*Job
+	mutex *sync.Mutex
+	conf  *Config
+	jobs  []*Job
 }
 
 // Init new context
-func NewContext(port int, path string) *Context {
-	var mutex sync.Mutex
-
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		log.Fatal("Unknown path")
-	}
-
-	return &Context{port: port, path: absPath, jobs: make([]*Job, 0), mutex: &mutex}
-}
-
-func (c *Context) getAppUrl() string {
-	if c.appUrl == "" {
-		return "http://" + c.getServerUri()
-	}
-	return c.appUrl
-}
-
-func (c *Context) getServerUri() string {
-	return "localhost:" + strconv.Itoa(c.port)
+func NewContext(c *Config) *Context {
+	return &Context{conf: c, jobs: make([]*Job, 0), mutex: &sync.Mutex{}}
 }
 
 func (c *Context) StartJob(p *Project) bool {
@@ -181,13 +161,13 @@ func (c *Context) removeOldjobs(p *Project) {
 
 func (c *Context) ListProjects() ([]*Project, error) {
 	result := make([]*Project, 0)
-	entries, err := os.ReadDir(c.path)
+	entries, err := os.ReadDir(c.conf.path)
 	if err != nil {
 		return nil, err
 	}
 	for _, e := range entries {
 		if e.IsDir() {
-			result = append(result, &Project{name: e.Name(), dir: c.path + "/" + e.Name()})
+			result = append(result, &Project{name: e.Name(), dir: c.conf.path + "/" + e.Name()})
 		}
 	}
 
@@ -199,7 +179,7 @@ func (c *Context) ListProjects() ([]*Project, error) {
 }
 
 func (c *Context) OpenProject(name string) *Project {
-	return &Project{name: name, dir: c.path + "/" + name}
+	return &Project{name: name, dir: c.conf.path + "/" + name}
 }
 
 func (c *Context) ListJobs(p *Project) ([]*Job, error) {
