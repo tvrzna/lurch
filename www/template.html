@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>lurch</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+		<link rel="stylesheet" type="text/css" href="{{.UrlFor "static/style/style.css" }}" />
+		<script type="text/javascript" src="{{.UrlFor "static/js/nunjs.min.js" }}"></script>
+		<script type="text/javascript" src="{{.UrlFor "static/js/ajsf.min.js" }}"></script>
+		<script type="text/javascript" src="{{.UrlFor "static/js/app.js" }}"></script>
+	</head>
+	<body>
+		<div id="wrapper">
+			{{ range .Projects }}
+				<div class="project" ajsf="{{ . }}">
+					<div class="top-panel">
+						<div class="project-name">
+							{{ . }}
+						</div>
+						<span ajsf-bind="status"></span>
+						<div class="project-action">
+							<span ajsf-bind="actionTitle" ajsf-click="performAction"></span>
+						</div>
+					</div>
+					<div class="history-panel">
+						<div ajsf-repeat="history">
+							<span ajsf-bind="item.name" ajsf-click="root().showBuild(item.name)"></span>
+						</div>
+					</div>
+					<div class="build-panel">
+						<div class="build-title collapsed" ajsf-bind="shownOutput.name"></div>
+						<div class="build-output">
+							<code>
+								<pre ajsf-bind="shownOutput.output"></pre>
+							</code>
+						</div>
+					</div>
+				</div>
+			{{ end }}
+		</div>
+		<script type="text/javascript">
+			const appUrl = "{{$.UrlFor "rest"}}";
+			{{ range .Projects }}initApp('{{ . }}');{{ end }}
+		</script>
+	</body>
+</html>

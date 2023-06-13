@@ -16,12 +16,14 @@ import (
 
 type Context struct {
 	mutex  *sync.Mutex
+	port   int
 	path   string
+	appUrl string
 	builds []*Build
 }
 
 // Init new build context
-func NewContext(path string) *Context {
+func NewContext(port int, path string) *Context {
 	var mutex sync.Mutex
 
 	absPath, err := filepath.Abs(path)
@@ -29,7 +31,18 @@ func NewContext(path string) *Context {
 		log.Fatal("Unknown path")
 	}
 
-	return &Context{path: absPath, builds: make([]*Build, 0), mutex: &mutex}
+	return &Context{port: port, path: absPath, builds: make([]*Build, 0), mutex: &mutex}
+}
+
+func (c *Context) getAppUrl() string {
+	if c.appUrl == "" {
+		return "http://" + c.getServerUri()
+	}
+	return c.appUrl
+}
+
+func (c *Context) getServerUri() string {
+	return "localhost:" + strconv.Itoa(c.port)
 }
 
 func (c *Context) Build(p *Project) bool {
