@@ -13,12 +13,12 @@ function initApp(name) {
 			$.get(appUrl + "/projects/" + context.projectName, {
 				success: data => {
 					var history = JSON.parse(data);
-					var shouldRefresh = (history.builds.length != context.history.length || (history.builds.length > 0 && context.history.length > 0 && history.builds[0].status != context.history[0].status));
-					context.history = history.builds;
+					var shouldRefresh = (history.jobs.length != context.history.length || (history.jobs.length > 0 && context.history.length > 0 && history.jobs[0].status != context.history[0].status));
+					context.history = history.jobs;
 					if (context.history.length > 0) {
 						context.status = context.history[0].status;
 						if (context.status == "inprogress") {
-							context.showBuild(undefined, context.history[0].name);
+							context.showJob(undefined, context.history[0].name);
 						}
 					}
 					if (shouldRefresh) {
@@ -42,11 +42,11 @@ function initApp(name) {
 				event.stopPropagation();
 			}
 
-			var action = appUrl + "/builds/" + context.projectName + "/";
+			var action = appUrl + "/jobs/" + context.projectName + "/";
 			if (context.status == 'inprogress') {
 				action += "interrupt/" + context.history[0].name
 			} else {
-				action += "build"
+				action += "start"
 			}
 
 			$.post(action, {
@@ -56,23 +56,23 @@ function initApp(name) {
 			});
 		};
 
-		context.showBuild = (event, buildNo) => {
+		context.showJob = (event, jobNo) => {
 			if (event != undefined) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
 
-			$.get(appUrl + "/builds/" + context.projectName + "/" + buildNo, {
+			$.get(appUrl + "/jobs/" + context.projectName + "/" + jobNo, {
 				success: data => {
-					var build = JSON.parse(data);
-					if (build.status == "inprogress") {
+					var job = JSON.parse(data);
+					if (job.status == "inprogress") {
 						setTimeout(() => {
-							context.showBuild(undefined, buildNo);
+							context.showJob(undefined, jobNo);
 						}, 1000);
-					} else if (context.shownOutput != undefined && context.shownOutput.status == "inprogress" && build.status != "inprogress") {
+					} else if (context.shownOutput != undefined && context.shownOutput.status == "inprogress" && job.status != "inprogress") {
 						context.loadHistory();
 					}
-					context.shownOutput = build;
+					context.shownOutput = job;
 					context.refresh();
 				}
 			});

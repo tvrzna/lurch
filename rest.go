@@ -16,16 +16,16 @@ const (
 )
 
 type DomainProject struct {
-	Name   string        `json:"name"`
-	Builds []DomainBuild `json:"builds"`
+	Name string      `json:"name"`
+	Jobs []DomainJob `json:"jobs"`
 }
 
-type DomainBuild struct {
-	Name      string      `json:"name"`
-	Status    BuildStatus `json:"status"`
-	StartDate time.Time   `json:"startDate"`
-	EndDate   time.Time   `json:"endDate"`
-	Output    *string     `json:"output"`
+type DomainJob struct {
+	Name      string    `json:"name"`
+	Status    JobStatus `json:"status"`
+	StartDate time.Time `json:"startDate"`
+	EndDate   time.Time `json:"endDate"`
+	Output    *string   `json:"output"`
 }
 
 type DomainStatus struct {
@@ -65,16 +65,16 @@ func (s RestService) HandleFunc(w http.ResponseWriter, r *http.Request) {
 			s.listProject(params[ParamProject], w, r)
 			return
 		}
-	case "builds":
+	case "jobs":
 		if params[ParamProject] != "" {
-			if params[ParamParam] == "build" {
-				s.initBuild(params[ParamProject], w, r)
+			if params[ParamParam] == "start" {
+				s.startJob(params[ParamProject], w, r)
 				return
 			} else if params[ParamParam] == "interrupt" {
-				s.interruptBuild(params[ParamProject], params[ParamParam2], w, r)
+				s.interruptJob(params[ParamProject], params[ParamParam2], w, r)
 				return
 			} else {
-				s.buildDetail(params[ParamProject], params[ParamParam], w, r)
+				s.jobDetail(params[ParamProject], params[ParamParam], w, r)
 				return
 			}
 		}
@@ -102,7 +102,7 @@ func (s RestService) parseUrl(url string) map[string]string {
 	return result
 }
 
-// List all projects and provide their build history
+// List all projects and provide their job history
 func (s RestService) listProjects(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		s.message(w, "", http.StatusMethodNotAllowed)
@@ -117,28 +117,28 @@ func (s RestService) listProjects(w http.ResponseWriter, r *http.Request) {
 	result := make([]DomainProject, len(projects))
 
 	for i, p := range projects {
-		builds, err := s.c.ListBuilds(p)
+		jobs, err := s.c.ListJobs(p)
 		if err != nil {
-			s.message(w, "could not list builds", http.StatusInternalServerError)
+			s.message(w, "could not list jobs", http.StatusInternalServerError)
 			return
 		}
 
-		result[i] = s.getProjectDetails(p.name, builds)
+		result[i] = s.getProjectDetails(p.name, jobs)
 	}
 
 	data, _ := json.Marshal(result)
 	w.Write(data)
 }
 
-// Get project details and history of builds
-func (s RestService) getProjectDetails(name string, builds []*Build) DomainProject {
-	project := DomainProject{Name: name, Builds: make([]DomainBuild, len(builds))}
-	for j, b := range builds {
+// Get project details and history of jobs
+func (s RestService) getProjectDetails(name string, jobs []*Job) DomainProject {
+	project := DomainProject{Name: name, Jobs: make([]DomainJob, len(jobs))}
+	for j, b := range jobs {
 		status := b.Status()
 		if s.c.IsBeingBuilt(b) {
 			status = InProgress
 		}
-		project.Builds[j] = DomainBuild{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate()}
+		project.Jobs[j] = DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate()}
 	}
 	return project
 }
@@ -150,50 +150,50 @@ func (s RestService) listProject(projectName string, w http.ResponseWriter, r *h
 		return
 	}
 
-	builds, err := s.c.ListBuilds(s.c.OpenProject(projectName))
+	jobs, err := s.c.ListJobs(s.c.OpenProject(projectName))
 	if err != nil {
-		s.message(w, "could not list builds", http.StatusInternalServerError)
+		s.message(w, "could not list jobs", http.StatusInternalServerError)
 		return
 	}
 
-	data, _ := json.Marshal(s.getProjectDetails(projectName, builds))
+	data, _ := json.Marshal(s.getProjectDetails(projectName, jobs))
 	w.Write(data)
 }
 
-// Initialize new build
-func (s RestService) initBuild(projectName string, w http.ResponseWriter, r *http.Request) {
+// Start new job
+func (s RestService) startJob(projectName string, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		s.message(w, "", http.StatusMethodNotAllowed)
 		return
 	}
-	if s.c.Build(s.c.OpenProject(projectName)) {
-		s.message(w, "build enqueued", http.StatusOK)
+	if s.c.StartJob(s.c.OpenProject(projectName)) {
+		s.message(w, "job enqueued", http.StatusOK)
 	} else {
-		s.message(w, "build could not be enqueued", http.StatusBadRequest)
+		s.message(w, "job could not be enqueued", http.StatusBadRequest)
 	}
 }
 
-func (s RestService) interruptBuild(projectName, buildNumber string, w http.ResponseWriter, r *http.Request) {
+func (s RestService) interruptJob(projectName, jobNumber string, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		s.message(w, "", http.StatusMethodNotAllowed)
 		return
 	}
 
-	b := s.c.OpenBuild(s.c.OpenProject(projectName), buildNumber)
+	b := s.c.OpenJob(s.c.OpenProject(projectName), jobNumber)
 	s.c.Interrupt(b)
 
-	s.message(w, "build interrupted", http.StatusOK)
+	s.message(w, "job interrupted", http.StatusOK)
 
 }
 
-// Gets details of project's build
-func (s RestService) buildDetail(projectName, buildNumber string, w http.ResponseWriter, r *http.Request) {
-	if buildNumber == "" {
+// Gets details of project's job
+func (s RestService) jobDetail(projectName, jobNumber string, w http.ResponseWriter, r *http.Request) {
+	if jobNumber == "" {
 		s.message(w, "", http.StatusNotFound)
 		return
 	}
 
-	b := s.c.OpenBuild(s.c.OpenProject(projectName), buildNumber)
+	b := s.c.OpenJob(s.c.OpenProject(projectName), jobNumber)
 
 	status := b.Status()
 	if s.c.IsBeingBuilt(b) {
@@ -202,6 +202,6 @@ func (s RestService) buildDetail(projectName, buildNumber string, w http.Respons
 
 	output, _ := b.ReadOutput()
 
-	data, _ := json.Marshal(DomainBuild{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: &output})
+	data, _ := json.Marshal(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: &output})
 	w.Write(data)
 }

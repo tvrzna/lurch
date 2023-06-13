@@ -24,12 +24,12 @@
 					</div>
 					<div class="history-panel">
 						<div ajsf-repeat="history">
-							<span ajsf-bind="item.name" ajsf-click="root().showBuild(item.name)"></span>
+							<span ajsf-bind="item.name" ajsf-click="root().showJob(item.name)"></span>
 						</div>
 					</div>
-					<div class="build-panel">
-						<div class="build-title collapsed" ajsf-bind="shownOutput.name"></div>
-						<div class="build-output">
+					<div class="job-panel">
+						<div class="job-title collapsed" ajsf-bind="shownOutput.name"></div>
+						<div class="job-output">
 							<code>
 								<pre ajsf-bind="shownOutput.output"></pre>
 							</code>

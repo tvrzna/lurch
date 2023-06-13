@@ -19,10 +19,10 @@ type Context struct {
 	port   int
 	path   string
 	appUrl string
-	builds []*Build
+	jobs   []*Job
 }
 
-// Init new build context
+// Init new context
 func NewContext(port int, path string) *Context {
 	var mutex sync.Mutex
 
@@ -31,7 +31,7 @@ func NewContext(port int, path string) *Context {
 		log.Fatal("Unknown path")
 	}
 
-	return &Context{port: port, path: absPath, builds: make([]*Build, 0), mutex: &mutex}
+	return &Context{port: port, path: absPath, jobs: make([]*Job, 0), mutex: &mutex}
 }
 
 func (c *Context) getAppUrl() string {
@@ -45,40 +45,40 @@ func (c *Context) getServerUri() string {
 	return "localhost:" + strconv.Itoa(c.port)
 }
 
-func (c *Context) Build(p *Project) bool {
-	// Check if being build
+func (c *Context) StartJob(p *Project) bool {
+	// Check if being Job
 	if c.isProjectBeingBuilt(p) {
 		return false
 	}
 
-	b, err := p.NewBuild()
+	b, err := p.NewJob()
 	if err != nil {
 		return false
 	}
 
 	c.mutex.Lock()
-	c.builds = append(c.builds, b)
+	c.jobs = append(c.jobs, b)
 	c.mutex.Unlock()
 
-	c.removeOldBuilds(p)
+	c.removeOldjobs(p)
 
-	go c.build(b)
+	go c.start(b)
 	return true
 }
 
-func (c *Context) Interrupt(b *Build) {
+func (c *Context) Interrupt(b *Job) {
 	c.mutex.Lock()
-	for _, build := range c.builds {
-		if b.p.name == build.p.name && b.name == build.name {
-			log.Printf("-- interrupting build #%s of %s", b.name, b.p.name)
-			build.c <- true
+	for _, job := range c.jobs {
+		if b.p.name == job.p.name && b.name == job.name {
+			log.Printf("-- interrupting job #%s of %s", b.name, b.p.name)
+			job.c <- true
 		}
 	}
 	defer c.mutex.Unlock()
 }
 
-func (c *Context) build(b *Build) {
-	log.Printf(">> started build #%s for %s", b.name, b.p.name)
+func (c *Context) start(b *Job) {
+	log.Printf(">> started job #%s for %s", b.name, b.p.name)
 	cmd := exec.Command("sh", "-c", b.p.dir+"/script.sh")
 	b.MkWorkspace()
 	cmd.Dir = b.WorkspacePath()
@@ -119,23 +119,23 @@ func (c *Context) build(b *Build) {
 	}
 	os.RemoveAll(b.WorkspacePath())
 
-	log.Printf("<< finished build #%s for %s", b.name, b.p.name)
+	log.Printf("<< finished job #%s for %s", b.name, b.p.name)
 }
 
-func (c *Context) removeFromSlice(b *Build) {
+func (c *Context) removeFromSlice(b *Job) {
 	c.mutex.Lock()
 	if index := c.indexOf(b); index >= 0 {
-		if len(c.builds) == 1 {
-			c.builds = c.builds[:0]
+		if len(c.jobs) == 1 {
+			c.jobs = c.jobs[:0]
 		} else {
-			c.builds = append(c.builds[:index], c.builds[index+1])
+			c.jobs = append(c.jobs[:index], c.jobs[index+1])
 		}
 	}
 	c.mutex.Unlock()
 }
 
-func (c *Context) indexOf(b *Build) int {
-	for i, build := range c.builds {
+func (c *Context) indexOf(b *Job) int {
+	for i, build := range c.jobs {
 		if b.p.name == build.p.name && b.name == build.name {
 			return i
 		}
@@ -143,7 +143,7 @@ func (c *Context) indexOf(b *Build) int {
 	return -1
 }
 
-func (c *Context) watchForInterrupt(b *Build, cmd *exec.Cmd) {
+func (c *Context) watchForInterrupt(b *Job, cmd *exec.Cmd) {
 	status := <-b.c
 	if status {
 		b.SetStatus(Stopped)
@@ -151,7 +151,7 @@ func (c *Context) watchForInterrupt(b *Build, cmd *exec.Cmd) {
 	}
 }
 
-func (c *Context) IsBeingBuilt(b *Build) bool {
+func (c *Context) IsBeingBuilt(b *Job) bool {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	return c.indexOf(b) >= 0
@@ -160,7 +160,7 @@ func (c *Context) IsBeingBuilt(b *Build) bool {
 func (c *Context) isProjectBeingBuilt(p *Project) bool {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	for _, b := range c.builds {
+	for _, b := range c.jobs {
 		if b.p.name == p.name {
 			return true
 		}
@@ -168,12 +168,12 @@ func (c *Context) isProjectBeingBuilt(p *Project) bool {
 	return false
 }
 
-func (c *Context) removeOldBuilds(p *Project) {
-	builds, _ := c.ListBuilds(p)
-	if len(builds) > 10 {
-		builds = builds[10:]
-		log.Print("-- remove old builds of ", p.name)
-		for _, b := range builds {
+func (c *Context) removeOldjobs(p *Project) {
+	jobs, _ := c.ListJobs(p)
+	if len(jobs) > 10 {
+		jobs = jobs[10:]
+		log.Print("-- remove old jobs of ", p.name)
+		for _, b := range jobs {
 			os.RemoveAll(b.dir)
 		}
 	}
@@ -202,15 +202,15 @@ func (c *Context) OpenProject(name string) *Project {
 	return &Project{name: name, dir: c.path + "/" + name}
 }
 
-func (c *Context) ListBuilds(p *Project) ([]*Build, error) {
-	result := make([]*Build, 0)
+func (c *Context) ListJobs(p *Project) ([]*Job, error) {
+	result := make([]*Job, 0)
 	entries, err := os.ReadDir(p.dir)
 	if err != nil {
 		return nil, err
 	}
 	for _, e := range entries {
 		if e.IsDir() {
-			result = append(result, &Build{name: e.Name(), dir: p.dir + "/" + e.Name(), p: p})
+			result = append(result, &Job{name: e.Name(), dir: p.dir + "/" + e.Name(), p: p})
 		}
 	}
 
@@ -223,8 +223,8 @@ func (c *Context) ListBuilds(p *Project) ([]*Build, error) {
 	return result, nil
 }
 
-func (c *Context) OpenBuild(p *Project, name string) *Build {
-	return &Build{name: name, dir: p.dir + "/" + name, p: p}
+func (c *Context) OpenJob(p *Project, name string) *Job {
+	return &Job{name: name, dir: p.dir + "/" + name, p: p}
 }
 
 func (c *Context) compressFolder(outputPath, inputPath string) error {

@@ -9,23 +9,23 @@ import (
 	"time"
 )
 
-type BuildStatus byte
+type JobStatus byte
 
 const (
-	Unknown BuildStatus = iota
+	Unknown JobStatus = iota
 	Finished
 	Stopped
 	Failed
 	InProgress
 )
 
-// Stringify build status
-func (b BuildStatus) String() string {
+// Stringify job status
+func (b JobStatus) String() string {
 	return []string{"unknown", "finished", "stopped", "failed", "inprogress"}[int(b)]
 }
 
-// Marshal build status type into string
-func (b BuildStatus) MarshalJSON() ([]byte, error) {
+// Marshal job status type into string
+func (b JobStatus) MarshalJSON() ([]byte, error) {
 	buffer := bytes.NewBufferString("\"")
 	buffer.WriteString(b.String())
 	buffer.WriteString("\"")
@@ -33,12 +33,12 @@ func (b BuildStatus) MarshalJSON() ([]byte, error) {
 	return buffer.Bytes(), nil
 }
 
-// Unmarshal string build status into type
-func (b *BuildStatus) UnmarshalJSON(data []byte) error {
+// Unmarshal string job status into type
+func (b *JobStatus) UnmarshalJSON(data []byte) error {
 	var v string
 	json.Unmarshal(data, &v)
 
-	*b = map[string]BuildStatus{
+	*b = map[string]JobStatus{
 		"unknown":    Unknown,
 		"finished":   Finished,
 		"stopped":    Stopped,
@@ -49,35 +49,35 @@ func (b *BuildStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type Build struct {
+type Job struct {
 	name string
 	dir  string
 	p    *Project
 	c    chan bool
 }
 
-// Get status of build
-func (b *Build) Status() BuildStatus {
+// Get status of job
+func (b *Job) Status() JobStatus {
 	data, err := os.ReadFile(b.dir + "/status")
 	if err != nil {
 		return Unknown
 	}
 	i, _ := strconv.Atoi(strings.TrimSpace(string(data)))
-	return BuildStatus(byte(i))
+	return JobStatus(byte(i))
 }
 
-// Set status of build
-func (b *Build) SetStatus(s BuildStatus) error {
+// Set status of job
+func (b *Job) SetStatus(s JobStatus) error {
 	return os.WriteFile(b.dir+"/status", []byte(strconv.Itoa(int(s))), 0600)
 }
 
-// Get path to console ouput of build
-func (b *Build) OutputPath() string {
+// Get path to console ouput of job
+func (b *Job) OutputPath() string {
 	return b.dir + "/" + "console.log"
 }
 
-// Read content of console output of build
-func (b *Build) ReadOutput() (string, error) {
+// Read content of console output of job
+func (b *Job) ReadOutput() (string, error) {
 	data, err := os.ReadFile(b.OutputPath())
 	if err != nil {
 		return "", err
@@ -85,8 +85,8 @@ func (b *Build) ReadOutput() (string, error) {
 	return string(data), nil
 }
 
-// Get start date of build
-func (b *Build) StartDate() time.Time {
+// Get start date of job
+func (b *Job) StartDate() time.Time {
 	s, err := os.Stat(b.dir)
 	if err != nil {
 		return time.UnixMicro(0)
@@ -94,8 +94,8 @@ func (b *Build) StartDate() time.Time {
 	return s.ModTime()
 }
 
-// Get end date of build
-func (b *Build) EndDate() time.Time {
+// Get end date of job
+func (b *Job) EndDate() time.Time {
 	s, err := os.Stat(b.dir + "/status")
 	if err != nil {
 		return time.UnixMicro(0)
@@ -104,11 +104,11 @@ func (b *Build) EndDate() time.Time {
 }
 
 // Path to workspace
-func (b *Build) WorkspacePath() string {
+func (b *Job) WorkspacePath() string {
 	return b.dir + "/workspace"
 }
 
 // Make workspace directory
-func (b *Build) MkWorkspace() error {
+func (b *Job) MkWorkspace() error {
 	return os.MkdirAll(b.WorkspacePath(), 0755)
 }

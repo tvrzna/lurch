@@ -11,7 +11,7 @@ type Project struct {
 	dir  string
 }
 
-// Get last build number
+// Get last job number
 func (p *Project) LastCount() int {
 	data, err := os.ReadFile(p.dir + "/counter")
 	if err != nil {
@@ -27,14 +27,14 @@ func (p *Project) RotateCount() (int, error) {
 	return count, os.WriteFile(p.dir+"/counter", []byte(strconv.Itoa(count)), 0600)
 }
 
-// Create new build, rotate last build number and make directory for new build
-func (p *Project) NewBuild() (*Build, error) {
-	buildNo, err := p.RotateCount()
+// Create new job, rotate last job number and make directory for new job
+func (p *Project) NewJob() (*Job, error) {
+	jobNo, err := p.RotateCount()
 	if err != nil {
 		return nil, err
 	}
-	strBuildNo := strconv.Itoa(buildNo)
-	b := &Build{name: strBuildNo, dir: p.dir + "/" + strBuildNo, p: p}
+	strJobNo := strconv.Itoa(jobNo)
+	b := &Job{name: strJobNo, dir: p.dir + "/" + strJobNo, p: p}
 	if err := os.MkdirAll(b.dir, 0755); err != nil {
 		return nil, err
 	}
