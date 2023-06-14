@@ -87,7 +87,7 @@ func (b *Job) ReadOutput() (string, error) {
 
 // Get start date of job
 func (b *Job) StartDate() time.Time {
-	s, err := os.Stat(b.dir)
+	s, err := os.Stat(b.dir + "/start")
 	if err != nil {
 		return time.UnixMicro(0)
 	}
@@ -111,4 +111,13 @@ func (b *Job) WorkspacePath() string {
 // Make workspace directory
 func (b *Job) MkWorkspace() error {
 	return os.MkdirAll(b.WorkspacePath(), 0755)
+}
+
+// Creates file for tracking the time of start
+func (b *Job) LogStart() error {
+	file, err := os.OpenFile(b.dir+"/start", os.O_RDONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }

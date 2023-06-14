@@ -61,6 +61,7 @@ func (c *Context) start(b *Job) {
 	log.Printf(">> started job #%s for %s", b.name, b.p.name)
 	cmd := exec.Command("sh", "-c", b.p.dir+"/script.sh")
 	b.MkWorkspace()
+	b.LogStart()
 	cmd.Dir = b.WorkspacePath()
 	output, err := os.OpenFile(b.OutputPath(), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
