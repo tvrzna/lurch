@@ -41,7 +41,7 @@ func (p *PageContext) UrlFor(path string) string {
 func (s *WebService) HandleFunc(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.URL.Path, "/static/") {
 		f, _ := www.ReadFile("www" + r.URL.Path)
-		w.Header().Add("content-type", s.getMimeType(r.URL.Path))
+		w.Header().Set("content-type", s.getMimeType(r.URL.Path))
 		w.Write(f)
 		return
 	} else if r.URL.Path == "" || r.URL.Path == "/" || r.URL.Path == "index.html" {
@@ -54,7 +54,7 @@ func (s *WebService) HandleFunc(w http.ResponseWriter, r *http.Request) {
 
 func (s *WebService) loadIndex(w http.ResponseWriter, r *http.Request) {
 	p := &PageContext{s: s}
-	w.Header().Add("content-type", "text/html")
+	w.Header().Set("content-type", "text/html")
 
 	projects, err := s.c.ListProjects()
 	if err != nil {

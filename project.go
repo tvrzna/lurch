@@ -39,6 +39,6 @@ func (p *Project) NewJob() (*Job, error) {
 		return nil, err
 	}
 	b.SetStatus(Unknown)
-	b.c = make(chan bool)
+	b.interrupt = make(chan bool)
 	return b, nil
 }

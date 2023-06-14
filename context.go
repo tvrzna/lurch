@@ -51,7 +51,7 @@ func (c *Context) Interrupt(b *Job) {
 	for _, job := range c.jobs {
 		if b.p.name == job.p.name && b.name == job.name {
 			log.Printf("-- interrupting job #%s of %s", b.name, b.p.name)
-			job.c <- true
+			job.interrupt <- true
 		}
 	}
 	defer c.mutex.Unlock()
@@ -91,7 +91,7 @@ func (c *Context) start(b *Job) {
 	} else {
 		b.SetStatus(Finished)
 	}
-	close(b.c)
+	close(b.interrupt)
 	c.removeFromSlice(b)
 
 	if err := c.compressFolder(b.WorkspacePath()+".tar.gz", b.WorkspacePath()); err != nil {
@@ -124,7 +124,7 @@ func (c *Context) indexOf(b *Job) int {
 }
 
 func (c *Context) watchForInterrupt(b *Job, cmd *exec.Cmd) {
-	status := <-b.c
+	status := <-b.interrupt
 	if status {
 		b.SetStatus(Stopped)
 		cmd.Process.Signal(os.Kill)

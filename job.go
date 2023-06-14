@@ -50,10 +50,10 @@ func (b *JobStatus) UnmarshalJSON(data []byte) error {
 }
 
 type Job struct {
-	name string
-	dir  string
-	p    *Project
-	c    chan bool
+	name      string
+	dir       string
+	p         *Project
+	interrupt chan bool
 }
 
 // Get status of job

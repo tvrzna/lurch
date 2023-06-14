@@ -52,7 +52,7 @@ func (s RestService) message(w http.ResponseWriter, message string, httpCode int
 }
 
 func (s RestService) HandleFunc(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("content-type", "application/json")
+	w.Header().Set("content-type", "application/json")
 
 	params := s.parseUrl(r.URL.Path)
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 )
@@ -14,5 +15,7 @@ func main() {
 	server.HandleFunc("/rest/", (&RestService{c: c}).HandleFunc)
 	server.HandleFunc("/", NewWebService(c).HandleFunc)
 
-	http.ListenAndServe(c.conf.getServerUri(), server)
+	log.Print("-- lurch started on ", conf.getServerUri())
+	http.ListenAndServe(conf.getServerUri(), server)
+	log.Print("-- lurch finished")
 }
