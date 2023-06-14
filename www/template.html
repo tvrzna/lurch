@@ -7,40 +7,54 @@
 		<link rel="stylesheet" type="text/css" href="{{.UrlFor "static/style/style.css" }}" />
 		<script type="text/javascript" src="{{.UrlFor "static/js/nunjs.min.js" }}"></script>
 		<script type="text/javascript" src="{{.UrlFor "static/js/ajsf.min.js" }}"></script>
-		<script type="text/javascript" src="{{.UrlFor "static/js/app.js" }}"></script>
+		<script type="text/javascript">
+			const appUrl = "{{$.UrlFor "rest"}}";
+		</script>
 	</head>
 	<body>
+		<div id="header">
+			lurch
+		</div>
 		<div id="wrapper">
 			{{ range .Projects }}
 				<div class="project" ajsf="{{ . }}">
 					<div class="top-panel">
-						<div class="project-name">
-							{{ . }}
+						<div class="data">
+							<div class="project-name">
+								{{ . }}
+								<span ajsf-text="selectedJob.name | prefix '#'" ajsf-show="selectedJob.name"></span>
+							</div>
+							<div class="detail" ajsf-show="selectedJob.name">
+								<span class="label">Status:</span>
+								<span ajsf-text="statusValue"></span>
+								<span class="label">Started:</span>
+								<span ajsf-text="startDateValue"></span>
+								<span ajsf-text="jobLength"><</span>
+							</div>
 						</div>
-						<span ajsf-bind="status"></span>
-						<div class="project-action">
-							<span ajsf-bind="actionTitle" ajsf-click="performAction"></span>
+						<div class="project-action" ajsf-click="performAction" ajsf-title="actionTitle">
+							<div ajsf-style-class="actionClass"></div>
 						</div>
 					</div>
-					<div class="history-panel">
-						<div ajsf-repeat="history">
-							<span ajsf-bind="item.name" ajsf-click="root().showJob(item.name)"></span>
+					<ul class="history-panel">
+						<li ajsf-repeat="history">
+							<span ajsf-text="item.name | prefix '#'"
+									ajsf-click="root().showJob(item.name)"
+									ajsf-style-class="item.status | prefix 'job-status-'"></span>
+						</li>
+					</ul>
+					<div class="job-panel" ajsf-show="selectedJob.name">
+						<div class="job-title collapsed" ajsf-click="toggleOutputCollapsed">
+							<span class="title">Output</span>
+							<span class="indicator"></span>
 						</div>
-					</div>
-					<div class="job-panel">
-						<div class="job-title collapsed" ajsf-bind="shownOutput.name"></div>
-						<div class="job-output">
-							<code>
-								<pre ajsf-bind="shownOutput.output"></pre>
-							</code>
+						<div class="job-output collapsed">
+							<pre ajsf-text="selectedJob.output"></pre>
 						</div>
 					</div>
 				</div>
 			{{ end }}
 		</div>
-		<script type="text/javascript">
-			const appUrl = "{{$.UrlFor "rest"}}";
-			{{ range .Projects }}initApp('{{ . }}');{{ end }}
-		</script>
+		<script type="text/javascript" src="{{.UrlFor "static/js/app.js" }}"></script>
 	</body>
 </html>

@@ -1,0 +1,146 @@
+html {
+	font-size: 16px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+	background-color: #f0f0f0;
+	font-size: 1rem;
+	margin: 0;
+}
+
+#wrapper {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.project {
+	border: thin solid #ddd;
+	border-radius: 0.25rem;
+	margin: 0.25rem 0;
+	width: 56.25rem;
+}
+
+.project .top-panel {
+	align-items: center;
+	background: #eee;
+	display: flex;
+	padding: 0.25rem;
+}
+
+.project .top-panel .data {
+	flex: 1;
+}
+
+.project .top-panel .data .project-name {
+	font-size: 1.5rem;
+	font-weight: normal;
+}
+
+.project .top-panel .data .detail {
+	font-size: 0.75rem;
+}
+
+.project .top-panel .data .detail .label {
+	font-weight: bold;
+}
+
+.project .top-panel .project-action:hover {
+	filter: opacity(1);
+}
+
+.project .top-panel .project-action {
+	align-items: center;
+	border: 0.125rem solid #999;
+	border-radius: 50%;
+	box-shadow: 0 0 0.25rem #999;
+	cursor: pointer;
+	display: flex;
+	filter: opacity(0.5);
+	height: 2.875rem;
+	justify-content: center;
+	width: 2.875rem;
+	transition: filter 0.125s linear;
+}
+
+.project .top-panel .project-action .action-start {
+	border-top: 0.8125rem solid transparent;
+	border-bottom: 0.8125rem solid transparent;
+	border-left: 1.25rem solid #575;
+	border-radius: .125rem;
+	margin-right: -0.25rem;
+	height: 0;
+	width: 0;
+}
+
+.project .top-panel .project-action .action-interrupt {
+	border: 0.625rem solid #755;
+	border-radius: .125rem;
+	height: 0;
+	width: 0;
+}
+
+.project .history-panel {
+	display: flex;
+	gap: 0.25rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.project .history-panel li {
+	cursor: pointer;
+	padding: 0.125rem;
+}
+
+.project .job-panel .job-title {
+	cursor: pointer;
+	user-select: none;
+}
+
+.project .job-panel .job-title .indicator {
+	border-bottom: 0 solid transparent;
+	border-left: 0.375rem solid transparent;
+	border-right: 0.375rem solid transparent;
+	border-top: 0.375rem solid #000;
+	display: inline-block;
+	height: 0;
+	width: 0;
+}
+
+.project .job-panel .job-title {
+	align-items: baseline;
+	background: #ddd;
+	display: flex;
+	font-size: 0.75rem;
+	line-height: 1rem;
+	padding: 0.25rem;
+}
+
+.project .job-panel .job-title .title {
+	flex: 1;
+}
+
+.project .job-panel .job-title.collapsed .indicator {
+	border-bottom: 0.375rem solid transparent;
+	border-left: 0.375rem solid #000;
+	border-right: 0 solid transparent;
+	border-top: 0.375rem solid transparent;
+}
+
+.project .job-panel .job-output pre {
+	font-size: 0.6875rem;
+	height: 20rem;
+	margin: 0;
+	overflow: auto;
+	padding: 0 0.25rem;
+	text-wrap: balance;
+	transition: height 0.125s linear;
+}
+
+.project .job-panel .job-output.collapsed  pre {
+	height: 0;
+	transition: height 0.125s linear;
+}
