@@ -16,6 +16,9 @@ func main() {
 	server.HandleFunc("/", NewWebService(c).HandleFunc)
 
 	log.Print("-- lurch started on ", conf.getServerUri())
-	http.ListenAndServe(conf.getServerUri(), server)
-	log.Print("-- lurch finished")
+	if err := http.ListenAndServe(conf.getServerUri(), server); err != nil {
+		log.Print("-- lurch start failed: ", err)
+	} else {
+		log.Print("-- lurch finished")
+	}
 }
