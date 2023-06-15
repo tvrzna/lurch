@@ -2,10 +2,6 @@ function initApp(name) {
 	var app = ajsf(name, context => {
 		context.projectName = name;
 
-		context.hello = function() {
-			console.log('hello');
-		};
-
 		context.history = [];
 
 		context.loadHistory = () => {
