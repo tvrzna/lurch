@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var buildVersion string
+
 const delimiter = "="
 
 type Config struct {
@@ -32,7 +34,7 @@ func LoadConfig(args []string) *Config {
 			fmt.Printf("Usage: lurch [options]\nOptions:\n\t-h, --help\t\t\tprint this help\n\t-v, --version\t\t\tprint version\n\t-t, --path [PATH]\t\tabsolute path to work dir\n\t-p, --port [PORT]\t\tsets port for listening\n\t-a, --app-url [APP_URL]\t\tapplication url (if behind proxy)\n")
 			os.Exit(0)
 		case "-v", "--version":
-			fmt.Printf("lurch 0.1.0\nhttps://github.com/tvrzna/lurch\n\nReleased under the MIT License.\n")
+			fmt.Printf("lurch %s\nhttps://github.com/tvrzna/lurch\n\nReleased under the MIT License.\n", c.GetVersion())
 			os.Exit(0)
 		}
 	})
@@ -76,4 +78,11 @@ func (c *Config) getAppUrl() string {
 
 func (c *Config) getServerUri() string {
 	return "localhost:" + strconv.Itoa(c.port)
+}
+
+func (c *Config) GetVersion() string {
+	if buildVersion == "" {
+		return "develop"
+	}
+	return buildVersion
 }

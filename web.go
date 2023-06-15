@@ -30,8 +30,9 @@ func NewWebService(c *Context) *WebService {
 }
 
 type PageContext struct {
-	s        *WebService
-	Projects []string
+	s              *WebService
+	ProjectVersion string
+	Projects       []string
 }
 
 func (p *PageContext) UrlFor(path string) string {
@@ -53,7 +54,7 @@ func (s *WebService) HandleFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *WebService) loadIndex(w http.ResponseWriter, r *http.Request) {
-	p := &PageContext{s: s}
+	p := &PageContext{s: s, ProjectVersion: s.c.conf.GetVersion()}
 	w.Header().Set("content-type", "text/html")
 
 	projects, err := s.c.ListProjects()

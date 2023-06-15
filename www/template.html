@@ -13,7 +13,9 @@
 	</head>
 	<body>
 		<div id="header">
-			lurch
+			<h1>lurch</h1>
+			<h2>{{ .ProjectVersion }}</h2>
+			<a href="https://github.com/tvrzna/lurch" target="_blank">github.com/tvrzna/lurch</a>
 		</div>
 		<div id="wrapper">
 			{{ range .Projects }}
@@ -46,7 +48,8 @@
 						<li ajsf-repeat="history">
 							<span ajsf-text="item.name | prefix '#'"
 									ajsf-click="root().showJob(item.name)"
-									ajsf-style-class="item.status | prefix 'job-status-'"></span>
+									ajsf-style-class="item.status | prefix 'job-status-' | suffix root().isSelected(item.name)"
+									ajsf-title="item.name | prefix '#' | suffix ' - ' | suffix root().statusValue(item) | suffix ' ' | suffix root().jobLength(item)"></span>
 						</li>
 					</ul>
 				</div>

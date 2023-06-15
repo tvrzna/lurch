@@ -17,6 +17,33 @@ body {
 	flex-direction: column;
 }
 
+#header {
+	font-size: 0.5rem;
+	padding: 0.5rem;
+	position: absolute;
+	right: 0;
+	text-align: right;
+}
+
+#header a {
+	color: #333;
+	text-decoration: underline;
+}
+
+#header h1 {
+	font-size: 1.75rem;
+	font-weight: normal;
+	margin: 0;
+	padding: 0;
+}
+
+#header h2 {
+	font-size: 0.875rem;
+	font-weight: normal;
+	margin: -0.375rem 0 0 0;
+	padding: 0;
+}
+
 .project {
 	background-color: #fff;
 	border: thin solid #aaa;
@@ -43,7 +70,7 @@ body {
 	border-color: #a2aba3;
 }
 
-.project.job-status-finished .top-panel {
+.project.job-status-finished .top-panel, .project.job-status-finished .history-panel {
 	background-color: #e8f5e9;
 }
 
@@ -51,7 +78,7 @@ body {
 	border-color: #b2ad9d;
 }
 
-.project.job-status-stopped .top-panel {
+.project.job-status-stopped .top-panel, .project.job-status-stopped .history-panel {
 	background-color: #fff8e1;
 }
 
@@ -59,7 +86,7 @@ body {
 	border-color: #b2a4a6;
 }
 
-.project.job-status-failed .top-panel {
+.project.job-status-failed .top-panel, .project.job-status-failed .history-panel {
 	background-color: #ffebee;
 }
 
@@ -67,7 +94,7 @@ body {
 	border-color: #9ea9b1;
 }
 
-.project.job-status-inprogress .top-panel {
+.project.job-status-inprogress .top-panel, .project.job-status-inprogress .history-panel {
 	background-color: #e3f2fd;
 	animation: project-inprogress 1.5s linear infinite;
 }
@@ -86,20 +113,21 @@ body {
 
 .project .top-panel .project-action:hover {
 	filter: opacity(1);
+	box-shadow: 0 0 0.25rem #999;
 }
 
 .project .top-panel .project-action {
 	align-items: center;
 	background-color: #eee;
-	border: 0.125rem solid #999;
+	border: thin solid #999;
 	border-radius: 50%;
-	box-shadow: 0 0 0.25rem #999;
+
 	cursor: pointer;
 	display: flex;
 	filter: opacity(0.5);
-	height: 2.875rem;
+	height: 2.5rem;
 	justify-content: center;
-	width: 2.875rem;
+	width: 2.5rem;
 	transition: filter 0.125s linear;
 }
 
@@ -121,16 +149,56 @@ body {
 }
 
 .project .history-panel {
+	font-size: 0.8125rem;
+	border-bottom-left-radius: 0.5rem;
+	border-bottom-right-radius: 0.5rem;
 	display: flex;
 	gap: 0.25rem;
+	justify-content: space-evenly;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	user-select: none;
 }
 
 .project .history-panel li {
 	cursor: pointer;
-	padding: 0.125rem;
+	padding: 0.25rem 0.125rem;
+}
+
+.project .history-panel li .selected {
+	font-weight: bold;
+}
+
+.project .history-panel li span {
+	position: relative;
+}
+
+.project .history-panel li span::after {
+	border-radius: 50%;
+	content: '';
+	display: block;
+	height: 0.25rem;
+	left: -0.375rem;
+	position: absolute;
+	top: 0.375rem;
+	width: 0.25rem;
+}
+
+.project .history-panel li span.job-status-finished::after {
+	background-color: #4caf50;
+}
+
+.project .history-panel li span.job-status-stopped::after {
+	background-color: #ffc107;
+}
+
+.project .history-panel li span.job-status-failed::after {
+	background-color: #f44336;
+}
+
+.project .history-panel li span.job-status-inprogress::after {
+	background-color: #2196f3;
 }
 
 .project .job-panel .job-title {
@@ -142,7 +210,7 @@ body {
 	border-bottom: 0 solid transparent;
 	border-left: 0.375rem solid transparent;
 	border-right: 0.375rem solid transparent;
-	border-top: 0.375rem solid #333;
+	border-top: 0.375rem solid #111;
 	display: inline-block;
 	height: 0;
 	width: 0;
@@ -155,11 +223,28 @@ body {
 
 .project .job-panel .job-title {
 	align-items: baseline;
+	color: #111;
 	background: #ddd;
 	display: flex;
 	font-size: 0.75rem;
 	line-height: 1rem;
 	padding: 0.25rem;
+}
+
+.project.job-status-finished .job-panel .job-title {
+	background-color: #a2aba3;
+}
+
+.project.job-status-stopped .job-panel .job-title {
+	background-color: #b2ad9d;
+}
+
+.project.job-status-failed .job-panel .job-title {
+	background-color: #b2a4a6;
+}
+
+.project.job-status-inprogress .job-panel .job-title {
+	background-color: #9ea9b1;
 }
 
 .project .job-panel .job-title .detail {
@@ -174,13 +259,14 @@ body {
 .project .job-panel .job-output pre {
 	background-color: #002B36;
 	color: #eee;
-	font-size: 0.6875rem;
+	font-size: 0.75rem;
 	height: 20rem;
 	margin: 0;
 	overflow: auto;
 	padding: 0.25rem;
 	text-wrap: balance;
 	transition: height 0.125s linear;
+	word-wrap: break-word;
 }
 
 .project .job-panel .job-output.collapsed  pre {
@@ -189,4 +275,24 @@ body {
 	transition-duration: 0.125s;
 	transition-timing-function: linear;
 	transition-property: height, padding;
+}
+
+@media (max-width: 900px) {
+	#header {
+		padding: 0.5rem 0.25rem;
+		position: relative;
+		text-align: left;
+	}
+
+	#header h1, #header h2 {
+		display: inline-block;
+	}
+
+	#header a {
+		display: table-row;
+	}
+
+	.project {
+		width: 98%;
+	}
 }

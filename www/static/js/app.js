@@ -42,11 +42,14 @@ function initApp(name) {
 			return "action action-start";
 		};
 
-		context.statusValue = () => {
-			if (context.selectedJob == undefined || context.selectedJob.status == undefined) {
+		context.statusValue = (job) => {
+			if (job == undefined) {
+				job = context.selectedJob;
+			}
+			if (job == undefined || job == undefined) {
 				return "Not started"
 			}
-			switch (context.selectedJob.status) {//"unknown", "finished", "stopped", "failed", "inprogress"
+			switch (job.status) {
 				case "finished":
 					return "Finished";
 				case "stopped":
@@ -60,24 +63,30 @@ function initApp(name) {
 			}
 		};
 
-		context.startDateValue = () => {
-			if (context.selectedJob == undefined || context.selectedJob.startDate == null) {
+		context.startDateValue = (job) => {
+			if (job == undefined) {
+				job = context.selectedJob;
+			}
+			if (job == undefined || job.startDate == null) {
 				return "Not started"
 			}
-			var d = new Date(context.selectedJob.startDate);
+			var d = new Date(job.startDate);
 
 			return d.getFullYear() + "-" + context.padToTwo(d.getMonth()+1) + "-" + context.padToTwo(d.getDate()) +
 				" " + context.padToTwo(d.getHours()) + ":" + context.padToTwo(d.getMinutes()) + ":" + context.padToTwo(d.getSeconds());
 		};
 
-		context.jobLength = () => {
-			if (context.selectedJob == undefined || context.selectedJob.startDate == null) {
+		context.jobLength = (job) => {
+			if (job == undefined) {
+				job = context.selectedJob;
+			}
+			if (job == undefined || job.startDate == null) {
 				return ""
 			}
-			var start = new Date(context.selectedJob.startDate);
+			var start = new Date(job.startDate);
 			var end = new Date();
-			if (context.selectedJob.endDate != null && context.selectedJob.status != "inprogress") {
-				end = new Date(context.selectedJob.endDate);
+			if (job.endDate != null && job.status != "inprogress") {
+				end = new Date(job.endDate);
 			}
 
 			return "(" + (Math.abs(start - end)/1000) + "s)";
@@ -168,6 +177,13 @@ function initApp(name) {
 				}
 			});
 
+		};
+
+		context.isSelected = (name) => {
+			if (context.selectedJob != undefined && context.selectedJob.name == name) {
+				return " selected";
+			}
+			return "";
 		};
 
 		context.loadHistory();
