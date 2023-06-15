@@ -160,8 +160,11 @@ function initApp(name) {
 					if (event != undefined) {
 						context.setOutputCollapsed(false);
 					}
+					var rootEl = $(context.rootElement);
+
+					rootEl.attr('class', 'project job-status-' + job.status);
 					context.refresh();
-					$(context.rootElement).find('pre')[0].scrollTop = $(context.rootElement).find('pre')[0].scrollHeight
+					rootEl.find('pre')[0].scrollTop = rootEl.find('pre')[0].scrollHeight;
 				}
 			});
 

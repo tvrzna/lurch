@@ -17,13 +17,18 @@
 		</div>
 		<div id="wrapper">
 			{{ range .Projects }}
-				<div class="project" ajsf="{{ . }}">
+				<div class="project job-status-empty" ajsf="{{ . }}">
 					<div class="top-panel">
-						<div class="data">
-							<div class="project-name">
-								{{ . }}
-								<span ajsf-text="selectedJob.name | prefix '#'" ajsf-show="selectedJob.name"></span>
-							</div>
+						<div class="project-name">
+							{{ . }}
+							<span ajsf-text="selectedJob.name | prefix '#'" ajsf-show="selectedJob.name"></span>
+						</div>
+						<div class="project-action" ajsf-click="performAction" ajsf-title="actionTitle">
+							<div ajsf-style-class="actionClass"></div>
+						</div>
+					</div>
+					<div class="job-panel" ajsf-show="selectedJob.name">
+						<div class="job-title collapsed" ajsf-click="toggleOutputCollapsed">
 							<div class="detail" ajsf-show="selectedJob.name">
 								<span class="label">Status:</span>
 								<span ajsf-text="statusValue"></span>
@@ -31,9 +36,10 @@
 								<span ajsf-text="startDateValue"></span>
 								<span ajsf-text="jobLength"><</span>
 							</div>
+							<span class="indicator"></span>
 						</div>
-						<div class="project-action" ajsf-click="performAction" ajsf-title="actionTitle">
-							<div ajsf-style-class="actionClass"></div>
+						<div class="job-output collapsed">
+							<pre ajsf-text="selectedJob.output"></pre>
 						</div>
 					</div>
 					<ul class="history-panel">
@@ -43,15 +49,6 @@
 									ajsf-style-class="item.status | prefix 'job-status-'"></span>
 						</li>
 					</ul>
-					<div class="job-panel" ajsf-show="selectedJob.name">
-						<div class="job-title collapsed" ajsf-click="toggleOutputCollapsed">
-							<span class="title">Output</span>
-							<span class="indicator"></span>
-						</div>
-						<div class="job-output collapsed">
-							<pre ajsf-text="selectedJob.output"></pre>
-						</div>
-					</div>
 				</div>
 			{{ end }}
 		</div>
