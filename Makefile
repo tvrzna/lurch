@@ -10,3 +10,6 @@ build:
 
 install:
 	install -DZs dist/${DISTFILE} ${DESTDIR}/usr/bin
+
+test:
+	go test -coverprofile cover.out ${TAGS_ARGS} ./...

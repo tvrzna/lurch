@@ -1,3 +1,4 @@
 dist/
 workdir/
 __debug_bin
+cover.out
