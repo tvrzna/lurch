@@ -94,12 +94,10 @@ func (s *WebService) downloadArtifact(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("content-disposition", fmt.Sprintf("attachment; filename=\"%s_%s.tar.gz\"", p.name, j.name))
 
 		w.WriteHeader(http.StatusOK)
-		if _, err := io.Copy(w, f); err != nil {
-			return
-		}
-		return
+		io.Copy(w, f)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
 	}
-	w.WriteHeader(http.StatusNotFound)
 }
 
 func (s *WebService) getMimeType(path string) string {
