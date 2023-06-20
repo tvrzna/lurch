@@ -182,17 +182,39 @@ function initApp(name) {
 			return "";
 		};
 
+		context.artifactDownloadUrl = () => {
+			if (context.selectedJob != undefined && context.selectedJob.name != undefined) {
+				return appUrl.replace('/rest', '') + "/download/" + context.projectName + "/" + context.selectedJob.name;
+			}
+			else "";
+		};
+
+		context.downloadArtifact = (event) => {
+			if (event != undefined) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			var link = $('<a href="' + context.artifactDownloadUrl() + '"></a>');
+			link.click();
+			link.remove();
+		};
+
 		context.loadHistory();
 
 		return context;
 	});
 
-	app.attribute('ajsf-style-class', (el, value, context) => {
+	app.attribute('ajsf-style-class', (el, value) => {
 		$(el).attr('class', value);
 	});
 
-	app.attribute('ajsf-title', (el, value, context) => {
+	app.attribute('ajsf-title', (el, value) => {
 		$(el).attr('title', value);
+	});
+
+	app.attribute('ajsf-href', (el, value) => {
+		$(el).attr('href', value);
 	});
 }
 

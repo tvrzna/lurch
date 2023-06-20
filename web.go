@@ -2,10 +2,13 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"mime"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -47,9 +50,10 @@ func (s *WebService) HandleFunc(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if r.URL.Path == "" || r.URL.Path == "/" || r.URL.Path == "index.html" {
 		s.loadIndex(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/download") {
+		s.downloadArtifact(w, r)
 	} else {
-		// TODO: handle the other files
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
@@ -59,7 +63,7 @@ func (s *WebService) loadIndex(w http.ResponseWriter, r *http.Request) {
 
 	projects, err := s.c.ListProjects()
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
 	}
 
@@ -68,9 +72,34 @@ func (s *WebService) loadIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.layout.Execute(w, p); err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
 	}
+}
+
+func (s *WebService) downloadArtifact(w http.ResponseWriter, r *http.Request) {
+	path := strings.Split(r.URL.Path, "/")
+	if len(path) > 3 {
+		p := s.c.OpenProject(path[2])
+		j := s.c.OpenJob(p, path[3])
+
+		f, err := os.Open(j.ArtifactPath())
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		defer f.Close()
+
+		w.Header().Set("content-type", s.getMimeType(j.ArtifactPath()))
+		w.Header().Set("content-disposition", fmt.Sprintf("attachment; filename=\"%s_%s.tar.gz\"", p.name, j.name))
+
+		w.WriteHeader(http.StatusOK)
+		if _, err := io.Copy(w, f); err != nil {
+			return
+		}
+		return
+	}
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func (s *WebService) getMimeType(path string) string {

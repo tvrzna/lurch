@@ -121,3 +121,8 @@ func (b *Job) LogStart() error {
 	}
 	return file.Close()
 }
+
+// Path to artifact archive
+func (b *Job) ArtifactPath() string {
+	return b.dir + "/workspace.tar.gz"
+}
