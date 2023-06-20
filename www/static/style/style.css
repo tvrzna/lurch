@@ -50,6 +50,7 @@ body {
 	border-radius: 0.5rem;
 	margin: 0.25rem 0;
 	width: 56.25rem;
+	z-index: 1;
 }
 
 .project .top-panel {
@@ -283,7 +284,7 @@ body {
 	transition-property: height, padding;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
 	#header {
 		padding: 0.5rem 0.25rem;
 		position: relative;

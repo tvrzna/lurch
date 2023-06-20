@@ -37,8 +37,8 @@
 								<span class="label">Started:</span>
 								<span ajsf-text="startDateValue"></span>
 								<span ajsf-text="jobLength"></span>
-								<span class="label">Artifact:</span>
-								<a ajsf-href="artifactDownloadUrl()" ajsf-click="downloadArtifact">Download</a>
+								<span class="label" ajsf-hide="selectedJob.status | eq 'inprogress'">Artifact:</span>
+								<a ajsf-href="artifactDownloadUrl()" ajsf-click="downloadArtifact" ajsf-hide="selectedJob.status | eq 'inprogress'">Download</a>
 							</div>
 							<span class="indicator"></span>
 						</div>
