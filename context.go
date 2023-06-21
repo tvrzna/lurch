@@ -73,6 +73,7 @@ func (c *Context) start(b *Job) {
 	defer output.Close()
 	cmd.Stdin = output
 	cmd.Stdout = output
+	cmd.Stderr = output
 
 	cmd.Start()
 	go c.watchForInterrupt(b, cmd)
