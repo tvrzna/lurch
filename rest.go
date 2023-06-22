@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -166,8 +167,8 @@ func (s RestService) startJob(projectName string, w http.ResponseWriter, r *http
 		s.message(w, "", http.StatusMethodNotAllowed)
 		return
 	}
-	if s.c.StartJob(s.c.OpenProject(projectName)) {
-		s.message(w, "job enqueued", http.StatusOK)
+	if buildNo := s.c.StartJob(s.c.OpenProject(projectName)); buildNo != "" {
+		s.message(w, fmt.Sprintf("job #%s enqueued", buildNo), http.StatusOK)
 	} else {
 		s.message(w, "job could not be enqueued", http.StatusBadRequest)
 	}

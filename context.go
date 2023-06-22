@@ -25,15 +25,15 @@ func NewContext(c *Config) *Context {
 	return &Context{conf: c, jobs: make([]*Job, 0), mutex: &sync.Mutex{}}
 }
 
-func (c *Context) StartJob(p *Project) bool {
-	// Check if being Job
+func (c *Context) StartJob(p *Project) string {
+	// Check if project is being built
 	if c.isProjectBeingBuilt(p) {
-		return false
+		return ""
 	}
 
 	b, err := p.NewJob()
 	if err != nil {
-		return false
+		return ""
 	}
 
 	c.mutex.Lock()
@@ -43,7 +43,7 @@ func (c *Context) StartJob(p *Project) bool {
 	c.removeOldjobs(p)
 
 	go c.start(b)
-	return true
+	return b.name
 }
 
 func (c *Context) Interrupt(b *Job) {
