@@ -127,3 +127,8 @@ func (b *Job) LogStart() error {
 func (b *Job) ArtifactPath() string {
 	return filepath.Join(b.dir, "workspace.tar.gz")
 }
+
+// Checks if jobs are equal
+func (b *Job) Equals(other *Job) bool {
+	return b.p != nil && other.p != nil && b.p.name == other.p.name && b.name == other.name
+}

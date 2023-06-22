@@ -179,3 +179,31 @@ func TestOutput(t *testing.T) {
 		panic(err)
 	}
 }
+
+func TestEquals(t *testing.T) {
+	j1 := &Job{name: "1", p: &Project{name: "project1"}, interrupt: make(chan bool)}
+	j2 := &Job{name: "1", p: &Project{name: "project1"}}
+	j3 := &Job{name: "1", p: &Project{name: "project2"}}
+	j4 := &Job{name: "2", p: &Project{name: "project1"}}
+	j5 := &Job{name: "1"}
+
+	if !j1.Equals(j2) {
+		t.Fatalf("TestEquals: j1 and j2 should equal")
+	}
+
+	if j1.Equals(j3) {
+		t.Fatalf("TestEquals: j1 and j3 shouldn't equal")
+	}
+
+	if j1.Equals(j4) {
+		t.Fatalf("TestEquals: j1 and j4 shouldn't equal")
+	}
+
+	if j1.Equals(j5) {
+		t.Fatalf("TestEquals: j1 and j3 shouldn't equal")
+	}
+
+	if j5.Equals(j2) {
+		t.Fatalf("TestEquals: j2 and j5 shouldn't equal")
+	}
+}

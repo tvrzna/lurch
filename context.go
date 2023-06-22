@@ -53,7 +53,7 @@ func (c *Context) StartJob(p *Project) string {
 func (c *Context) Interrupt(b *Job) {
 	c.mutex.Lock()
 	for _, job := range c.jobs {
-		if b.p.name == job.p.name && b.name == job.name {
+		if b.Equals(job) {
 			log.Printf("-- interrupting job #%s of %s", b.name, b.p.name)
 			job.interrupt <- true
 		}
@@ -137,8 +137,8 @@ func (c *Context) removeFromSlice(b *Job) {
 }
 
 func (c *Context) indexOf(b *Job) int {
-	for i, build := range c.jobs {
-		if b.p.name == build.p.name && b.name == build.name {
+	for i, job := range c.jobs {
+		if b.Equals(job) {
 			return i
 		}
 	}
