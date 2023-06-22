@@ -26,7 +26,7 @@ type DomainJob struct {
 	Status    JobStatus `json:"status"`
 	StartDate time.Time `json:"startDate"`
 	EndDate   time.Time `json:"endDate"`
-	Output    *string   `json:"output"`
+	Output    string    `json:"output,omitempty"`
 }
 
 type DomainStatus struct {
@@ -203,6 +203,6 @@ func (s RestService) jobDetail(projectName, jobNumber string, w http.ResponseWri
 
 	output, _ := b.ReadOutput()
 
-	data, _ := json.Marshal(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: &output})
+	data, _ := json.Marshal(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: output})
 	w.Write(data)
 }
