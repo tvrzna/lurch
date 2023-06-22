@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -58,7 +59,7 @@ type Job struct {
 
 // Get status of job
 func (b *Job) Status() JobStatus {
-	data, err := os.ReadFile(b.dir + "/status")
+	data, err := os.ReadFile(filepath.Join(b.dir, "status"))
 	if err != nil {
 		return Unknown
 	}
@@ -68,12 +69,12 @@ func (b *Job) Status() JobStatus {
 
 // Set status of job
 func (b *Job) SetStatus(s JobStatus) error {
-	return os.WriteFile(b.dir+"/status", []byte(strconv.Itoa(int(s))), 0600)
+	return os.WriteFile(filepath.Join(b.dir, "status"), []byte(strconv.Itoa(int(s))), 0600)
 }
 
 // Get path to console ouput of job
 func (b *Job) OutputPath() string {
-	return b.dir + "/" + "console.log"
+	return filepath.Join(b.dir, "console.log")
 }
 
 // Read content of console output of job
@@ -87,7 +88,7 @@ func (b *Job) ReadOutput() (string, error) {
 
 // Get start date of job
 func (b *Job) StartDate() time.Time {
-	s, err := os.Stat(b.dir + "/start")
+	s, err := os.Stat(filepath.Join(b.dir, "start"))
 	if err != nil {
 		return time.UnixMicro(0)
 	}
@@ -96,7 +97,7 @@ func (b *Job) StartDate() time.Time {
 
 // Get end date of job
 func (b *Job) EndDate() time.Time {
-	s, err := os.Stat(b.dir + "/status")
+	s, err := os.Stat(filepath.Join(b.dir, "status"))
 	if err != nil {
 		return time.UnixMicro(0)
 	}
@@ -105,7 +106,7 @@ func (b *Job) EndDate() time.Time {
 
 // Path to workspace
 func (b *Job) WorkspacePath() string {
-	return b.dir + "/workspace"
+	return filepath.Join(b.dir, "workspace")
 }
 
 // Make workspace directory
@@ -115,7 +116,7 @@ func (b *Job) MkWorkspace() error {
 
 // Creates file for tracking the time of start
 func (b *Job) LogStart() error {
-	file, err := os.OpenFile(b.dir+"/start", os.O_RDONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile(filepath.Join(b.dir, "start"), os.O_RDONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}
@@ -124,5 +125,5 @@ func (b *Job) LogStart() error {
 
 // Path to artifact archive
 func (b *Job) ArtifactPath() string {
-	return b.dir + "/workspace.tar.gz"
+	return filepath.Join(b.dir, "workspace.tar.gz")
 }

@@ -59,7 +59,7 @@ func (c *Context) Interrupt(b *Job) {
 
 func (c *Context) start(b *Job) {
 	log.Printf(">> started job #%s for %s", b.name, b.p.name)
-	cmd := exec.Command("sh", "-c", b.p.dir+"/script.sh")
+	cmd := exec.Command("sh", "-c", filepath.Join(b.p.dir, "script.sh"))
 	b.MkWorkspace()
 	b.LogStart()
 	cmd.Dir = b.WorkspacePath()
@@ -192,7 +192,7 @@ func (c *Context) ListJobs(p *Project) ([]*Job, error) {
 	}
 	for _, e := range entries {
 		if e.IsDir() {
-			result = append(result, &Job{name: e.Name(), dir: p.dir + "/" + e.Name(), p: p})
+			result = append(result, &Job{name: e.Name(), dir: filepath.Join(p.dir, e.Name()), p: p})
 		}
 	}
 
@@ -206,7 +206,7 @@ func (c *Context) ListJobs(p *Project) ([]*Job, error) {
 }
 
 func (c *Context) OpenJob(p *Project, name string) *Job {
-	return &Job{name: name, dir: p.dir + "/" + name, p: p}
+	return &Job{name: name, dir: filepath.Join(p.dir, name), p: p}
 }
 
 func (c *Context) compressFolder(outputPath, inputPath string) error {

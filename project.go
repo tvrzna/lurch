@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -13,7 +14,7 @@ type Project struct {
 
 // Get last job number
 func (p *Project) LastCount() int {
-	data, err := os.ReadFile(p.dir + "/counter")
+	data, err := os.ReadFile(filepath.Join(p.dir, "counter"))
 	if err != nil {
 		return 0
 	}
@@ -24,7 +25,7 @@ func (p *Project) LastCount() int {
 // Rotate count
 func (p *Project) RotateCount() (int, error) {
 	count := p.LastCount() + 1
-	return count, os.WriteFile(p.dir+"/counter", []byte(strconv.Itoa(count)), 0600)
+	return count, os.WriteFile(filepath.Join(p.dir, "counter"), []byte(strconv.Itoa(count)), 0600)
 }
 
 // Create new job, rotate last job number and make directory for new job
@@ -34,7 +35,7 @@ func (p *Project) NewJob() (*Job, error) {
 		return nil, err
 	}
 	strJobNo := strconv.Itoa(jobNo)
-	b := &Job{name: strJobNo, dir: p.dir + "/" + strJobNo, p: p}
+	b := &Job{name: strJobNo, dir: filepath.Join(p.dir, strJobNo), p: p}
 	if err := os.MkdirAll(b.dir, 0755); err != nil {
 		return nil, err
 	}
