@@ -17,7 +17,7 @@ Options:
 
 ## How to setup project
 1. In `workdir` create a folder with name that represents the project.
-2. In created folder create `script.sh` and add execute permission to it.
+2. In created folder create `script.sh` and add execute permission to it. Or for Windows create `script.cmd`.
 3. Create your shell script with some content e.g.
 ```bash
 #!/bin/sh -e

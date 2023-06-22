@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -59,7 +60,14 @@ func (c *Context) Interrupt(b *Job) {
 
 func (c *Context) start(b *Job) {
 	log.Printf(">> started job #%s for %s", b.name, b.p.name)
-	cmd := exec.Command("sh", "-c", filepath.Join(b.p.dir, "script.sh"))
+
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command(filepath.Join(b.p.dir, "script.cmd"))
+	} else {
+		cmd = exec.Command("sh", "-c", filepath.Join(b.p.dir, "script.sh"))
+	}
+
 	b.MkWorkspace()
 	b.LogStart()
 	cmd.Dir = b.WorkspacePath()
