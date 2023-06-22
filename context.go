@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,14 +17,16 @@ import (
 )
 
 type Context struct {
-	mutex *sync.Mutex
-	conf  *Config
-	jobs  []*Job
+	mutex     *sync.Mutex
+	interrupt chan bool
+	conf      *Config
+	jobs      []*Job
+	webServer *http.Server
 }
 
 // Init new context
 func NewContext(c *Config) *Context {
-	return &Context{conf: c, jobs: make([]*Job, 0), mutex: &sync.Mutex{}}
+	return &Context{conf: c, jobs: make([]*Job, 0), mutex: &sync.Mutex{}, interrupt: make(chan bool)}
 }
 
 func (c *Context) StartJob(p *Project) string {
@@ -55,7 +58,16 @@ func (c *Context) Interrupt(b *Job) {
 			job.interrupt <- true
 		}
 	}
-	defer c.mutex.Unlock()
+	c.mutex.Unlock()
+}
+
+func (c *Context) InterruptAll() {
+	c.mutex.Lock()
+	for _, job := range c.jobs {
+		log.Printf("-- interrupting job #%s of %s", job.name, job.p.name)
+		job.interrupt <- true
+	}
+	c.mutex.Unlock()
 }
 
 func (c *Context) start(b *Job) {
