@@ -1,10 +1,10 @@
 # lurch
 
-Simple CI/CD
+Simple CI/CD without database or any dependency
 
 ![](screenshot.png)
 
-### Usage
+## Usage
 ```
 Usage: lurch [options]
 Options:
@@ -33,3 +33,12 @@ scp target/build server:/opt/www
 rm -rf .git/
 ```
 4. Open lurch in browser and start the job.
+
+## Roadmap
+- [x] Core
+- [x] REST API
+- [x] Web UI
+- [ ] Build parameters passed as environmentals
+- [ ] System health info (CPU/Memory/Free space/...?)
+- [ ] CLI
+- [ ] Periodical watcher (running custom script saving state of last check)
