@@ -72,7 +72,7 @@ func (b *Job) SetStatus(s JobStatus) error {
 	return os.WriteFile(filepath.Join(b.dir, "status"), []byte(strconv.Itoa(int(s))), 0600)
 }
 
-// Get path to console ouput of job
+// Get path to console output of job
 func (b *Job) OutputPath() string {
 	return filepath.Join(b.dir, "console.log")
 }
