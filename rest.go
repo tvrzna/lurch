@@ -43,9 +43,9 @@ func (s RestService) message(w http.ResponseWriter, message string, httpCode int
 	if message == "" {
 		message = http.StatusText(httpCode)
 	}
-	if data, err := json.Marshal(&DomainStatus{Message: message, Code: httpCode}); err == nil {
-		w.Write(data)
-	} else {
+
+	e := json.NewEncoder(w)
+	if err := e.Encode(&DomainStatus{Message: message, Code: httpCode}); err != nil {
 		log.Print("could not marshal error message '", message, "'")
 		w.WriteHeader(500)
 		w.Write([]byte("system error"))
@@ -127,8 +127,8 @@ func (s RestService) listProjects(w http.ResponseWriter, r *http.Request) {
 		result[i] = s.getProjectDetails(p.name, jobs)
 	}
 
-	data, _ := json.Marshal(result)
-	w.Write(data)
+	e := json.NewEncoder(w)
+	e.Encode(result)
 }
 
 // Get project details and history of jobs
@@ -157,8 +157,8 @@ func (s RestService) listProject(projectName string, w http.ResponseWriter, r *h
 		return
 	}
 
-	data, _ := json.Marshal(s.getProjectDetails(projectName, jobs))
-	w.Write(data)
+	e := json.NewEncoder(w)
+	e.Encode(s.getProjectDetails(projectName, jobs))
 }
 
 // Start new job
@@ -184,7 +184,6 @@ func (s RestService) interruptJob(projectName, jobNumber string, w http.Response
 	s.c.Interrupt(b)
 
 	s.message(w, "job interrupted", http.StatusOK)
-
 }
 
 // Gets details of project's job
@@ -203,6 +202,6 @@ func (s RestService) jobDetail(projectName, jobNumber string, w http.ResponseWri
 
 	output, _ := b.ReadOutput()
 
-	data, _ := json.Marshal(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: output})
-	w.Write(data)
+	e := json.NewEncoder(w)
+	e.Encode(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: output})
 }
