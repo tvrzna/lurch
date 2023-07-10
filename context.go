@@ -116,7 +116,7 @@ func (c *Context) start(b *Job) {
 	close(b.interrupt)
 	c.removeFromSlice(b)
 
-	if err := c.compressFolder(b.WorkspacePath()+".tar.gz", b.WorkspacePath()); err != nil {
+	if err := c.compressFolder(b.ArtifactPath(), b.WorkspacePath()); err != nil {
 		log.Print("-- could not compress", b.WorkspacePath())
 	}
 	os.RemoveAll(b.WorkspacePath())
