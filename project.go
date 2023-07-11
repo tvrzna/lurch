@@ -8,8 +8,9 @@ import (
 )
 
 type Project struct {
-	name string
-	dir  string
+	name   string
+	dir    string
+	params map[string]string
 }
 
 // Get last job number
@@ -42,4 +43,21 @@ func (p *Project) NewJob() (*Job, error) {
 	b.SetStatus(Unknown)
 	b.interrupt = make(chan bool)
 	return b, nil
+}
+
+// Sets params in expected format, exclude all params with incorrect format
+func (p *Project) SetParams(params map[string]string) {
+	if checkedParams := checkParams(params); checkedParams != nil {
+		p.params = checkedParams
+	}
+}
+
+// Saves params into file
+func (p *Project) SaveParams() error {
+	return saveParams(filepath.Join(p.dir, "params"), p.params)
+}
+
+// Loads params from file into map, if not found, leave method without drama
+func (p *Project) LoadParams() {
+	p.params = loadParams(filepath.Join(p.dir, "params"))
 }

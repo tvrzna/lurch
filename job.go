@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -141,51 +139,15 @@ func (b *Job) Equals(other *Job) bool {
 
 // Sets params in expected format, exclude all params with incorrect format
 func (b *Job) SetParams(params map[string]string) {
-	if params != nil {
-		b.params = make(map[string]string)
-		for k, v := range params {
-			if envVariableFormat.MatchString(k) {
-				b.params[strings.ToUpper(k)] = v
-			}
-		}
-	} else {
-		b.params = nil
-	}
+	b.params = checkParams(params)
 }
 
 // Saves params into file
 func (b *Job) SaveParams() error {
-	if b.params != nil && len(b.params) > 0 {
-		file, err := os.OpenFile(filepath.Join(b.dir, "params"), os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		for k, v := range b.params {
-			if _, err := file.WriteString(fmt.Sprintf("%s=%s\n", k, v)); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	return saveParams(filepath.Join(b.dir, "params"), b.params)
 }
 
 // Loads params from file into map, if not found, leave method without drama
 func (b *Job) LoadParams() {
-	file, err := os.Open(filepath.Join(b.dir, "params"))
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	b.params = make(map[string]string)
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		splitIndex := strings.Index(line, "=")
-		if splitIndex >= 0 {
-			b.params[line[:splitIndex]] = line[splitIndex+1:]
-		}
-	}
+	b.params = loadParams(filepath.Join(b.dir, "params"))
 }

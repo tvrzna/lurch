@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -261,6 +260,4 @@ func TestSaveLoadParams(t *testing.T) {
 	if len(b2.params) != 2 {
 		t.Fatal("TestSaveParams: unexpected length of loaded params")
 	}
-
-	fmt.Println(b2.params)
 }

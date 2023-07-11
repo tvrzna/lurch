@@ -37,10 +37,10 @@ func (c *Context) StartJob(p *Project, params map[string]string) string {
 	}
 
 	b, err := p.NewJob()
-	b.SetParams(params)
 	if err != nil {
 		return ""
 	}
+	b.SetParams(params)
 
 	c.mutex.Lock()
 	c.jobs = append(c.jobs, b)
@@ -85,6 +85,9 @@ func (c *Context) start(b *Job) {
 	b.MkWorkspace()
 	b.LogStart()
 	b.SaveParams()
+
+	b.p.SetParams(b.params)
+	b.p.SaveParams()
 
 	c.setEnv(cmd, b)
 	cmd.Dir = b.WorkspacePath()
