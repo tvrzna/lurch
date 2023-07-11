@@ -22,11 +22,12 @@ type DomainProject struct {
 }
 
 type DomainJob struct {
-	Name      string    `json:"name"`
-	Status    JobStatus `json:"status"`
-	StartDate time.Time `json:"startDate"`
-	EndDate   time.Time `json:"endDate"`
-	Output    string    `json:"output,omitempty"`
+	Name      string            `json:"name"`
+	Status    JobStatus         `json:"status"`
+	StartDate time.Time         `json:"startDate"`
+	EndDate   time.Time         `json:"endDate"`
+	Output    string            `json:"output,omitempty"`
+	Params    map[string]string `json:"params,omitempty"`
 }
 
 type DomainStatus struct {
@@ -167,8 +168,12 @@ func (s RestService) startJob(projectName string, w http.ResponseWriter, r *http
 		s.message(w, "", http.StatusMethodNotAllowed)
 		return
 	}
-	if buildNo := s.c.StartJob(s.c.OpenProject(projectName)); buildNo != "" {
-	if buildNo := s.c.StartJob(s.c.OpenProject(projectName), nil); buildNo != "" {
+
+	var t DomainJob
+	decoder := json.NewDecoder(r.Body)
+	decoder.Decode(&t)
+
+	if buildNo := s.c.StartJob(s.c.OpenProject(projectName), t.Params); buildNo != "" {
 		s.message(w, fmt.Sprintf("job #%s enqueued", buildNo), http.StatusOK)
 	} else {
 		s.message(w, "job could not be enqueued", http.StatusBadRequest)
