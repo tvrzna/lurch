@@ -1,14 +1,19 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var envVariableFormat = regexp.MustCompile(`[a-zA-Z_]+[a-zA-Z0-9_]+`)
 
 type JobStatus byte
 
@@ -55,6 +60,7 @@ type Job struct {
 	dir       string
 	p         *Project
 	interrupt chan bool
+	params    map[string]string
 }
 
 // Get status of job
@@ -131,4 +137,55 @@ func (b *Job) ArtifactPath() string {
 // Checks if jobs are equal
 func (b *Job) Equals(other *Job) bool {
 	return b.p != nil && other.p != nil && b.p.name == other.p.name && b.name == other.name
+}
+
+// Sets params in expected format, exclude all params with incorrect format
+func (b *Job) SetParams(params map[string]string) {
+	if params != nil {
+		b.params = make(map[string]string)
+		for k, v := range params {
+			if envVariableFormat.MatchString(k) {
+				b.params[strings.ToUpper(k)] = v
+			}
+		}
+	} else {
+		b.params = nil
+	}
+}
+
+// Saves params into file
+func (b *Job) SaveParams() error {
+	if b.params != nil && len(b.params) > 0 {
+		file, err := os.OpenFile(filepath.Join(b.dir, "params"), os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		for k, v := range b.params {
+			if _, err := file.WriteString(fmt.Sprintf("%s=%s\n", k, v)); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Loads params from file into map, if not found, leave method without drama
+func (b *Job) LoadParams() {
+	file, err := os.Open(filepath.Join(b.dir, "params"))
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	b.params = make(map[string]string)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		splitIndex := strings.Index(line, "=")
+		if splitIndex >= 0 {
+			b.params[line[:splitIndex]] = line[splitIndex+1:]
+		}
+	}
 }

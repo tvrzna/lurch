@@ -40,7 +40,7 @@ func TestContext(t *testing.T) {
 		t.Fatalf("TestContext: 2 project were expected, but found %d", len(projects))
 	}
 
-	c.StartJob(p1)
+	c.StartJob(p1, map[string]string{"key1": "val1", "_key2": "val2"})
 	time.Sleep(3 * time.Second)
 
 	if jobs, err := c.ListJobs(p1); err != nil {
@@ -55,7 +55,7 @@ func TestContext(t *testing.T) {
 		t.Fatalf("TestContext: job ends with unexpected status %s", s.String())
 	}
 
-	c.StartJob(p2)
+	c.StartJob(p2, nil)
 	time.Sleep(2 * time.Second)
 	j := c.OpenJob(p2, strconv.Itoa(p2.LastCount()))
 	if !c.IsBeingBuilt(j) {

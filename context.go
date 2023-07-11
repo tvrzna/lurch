@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -29,13 +30,14 @@ func NewContext(c *Config) *Context {
 	return &Context{conf: c, jobs: make([]*Job, 0), mutex: &sync.Mutex{}, interrupt: make(chan bool)}
 }
 
-func (c *Context) StartJob(p *Project) string {
+func (c *Context) StartJob(p *Project, params map[string]string) string {
 	// Check if project is being built
 	if c.isProjectBeingBuilt(p) {
 		return ""
 	}
 
 	b, err := p.NewJob()
+	b.SetParams(params)
 	if err != nil {
 		return ""
 	}
@@ -82,6 +84,9 @@ func (c *Context) start(b *Job) {
 
 	b.MkWorkspace()
 	b.LogStart()
+	b.SaveParams()
+
+	c.setEnv(cmd, b)
 	cmd.Dir = b.WorkspacePath()
 	output, err := os.OpenFile(b.OutputPath(), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
@@ -122,6 +127,19 @@ func (c *Context) start(b *Job) {
 	os.RemoveAll(b.WorkspacePath())
 
 	log.Printf("<< finished job #%s for %s", b.name, b.p.name)
+}
+
+func (c *Context) setEnv(cmd *exec.Cmd, b *Job) {
+	envs := make([]string, 1)
+	envs = append(envs, fmt.Sprintf("PATH=%s", os.Getenv("PATH")))
+
+	if b.params != nil {
+		for k, v := range b.params {
+			envs = append(envs, fmt.Sprintf("%s=%s", k, v))
+		}
+	}
+
+	cmd.Env = envs
 }
 
 func (c *Context) removeFromSlice(b *Job) {

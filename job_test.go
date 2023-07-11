@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -206,4 +207,60 @@ func TestEquals(t *testing.T) {
 	if j5.Equals(j2) {
 		t.Fatalf("TestEquals: j2 and j5 shouldn't equal")
 	}
+}
+
+func TestSetParams(t *testing.T) {
+	b := &Job{}
+
+	b.SetParams(map[string]string{
+		"1":   "value1",
+		"k2":  "value2",
+		"k-3": "value3",
+		"k_4": "value4",
+	})
+
+	if p := b.params["1"]; p != "" {
+		t.Fatalf("TestSetParams: unexpected value for key 1: '%s'", p)
+	}
+
+	if p := b.params["K2"]; p != "value2" {
+		t.Fatalf("TestSetParams: unexpected value for key k2: '%s'", p)
+	}
+
+	if p := b.params["K-3"]; p != "" {
+		t.Fatalf("TestSetParams: unexpected value for key k-3: '%s'", p)
+	}
+
+	if p := b.params["K_4"]; p != "value4" {
+		t.Fatalf("TestSetParams: unexpected value for key k_4: '%s'", p)
+	}
+}
+
+func TestSaveLoadParams(t *testing.T) {
+	tmpdir, err := os.MkdirTemp(os.TempDir(), "lurch-test-workdir")
+	if err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(tmpdir)
+
+	jobPath := filepath.Join(tmpdir, "build-1")
+	if err := os.Mkdir(jobPath, 0755); err != nil {
+		panic(err)
+	}
+
+	b := &Job{dir: jobPath}
+	b.SetParams(map[string]string{"k1": "v1", "k2": "v2"})
+
+	if err := b.SaveParams(); err != nil {
+		t.Fatal("TestSaveParams: unexpected error", err)
+	}
+
+	b2 := &Job{dir: jobPath}
+	b2.LoadParams()
+
+	if len(b2.params) != 2 {
+		t.Fatal("TestSaveParams: unexpected length of loaded params")
+	}
+
+	fmt.Println(b2.params)
 }

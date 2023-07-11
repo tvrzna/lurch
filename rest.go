@@ -168,6 +168,7 @@ func (s RestService) startJob(projectName string, w http.ResponseWriter, r *http
 		return
 	}
 	if buildNo := s.c.StartJob(s.c.OpenProject(projectName)); buildNo != "" {
+	if buildNo := s.c.StartJob(s.c.OpenProject(projectName), nil); buildNo != "" {
 		s.message(w, fmt.Sprintf("job #%s enqueued", buildNo), http.StatusOK)
 	} else {
 		s.message(w, "job could not be enqueued", http.StatusBadRequest)
