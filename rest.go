@@ -17,8 +17,9 @@ const (
 )
 
 type DomainProject struct {
-	Name string      `json:"name"`
-	Jobs []DomainJob `json:"jobs"`
+	Name   string            `json:"name"`
+	Jobs   []DomainJob       `json:"jobs"`
+	Params map[string]string `json:"params,omitempty"`
 }
 
 type DomainJob struct {
@@ -124,8 +125,8 @@ func (s RestService) listProjects(w http.ResponseWriter, r *http.Request) {
 			s.message(w, "could not list jobs", http.StatusInternalServerError)
 			return
 		}
-
-		result[i] = s.getProjectDetails(p.name, jobs)
+		p.LoadParams()
+		result[i] = s.getProjectDetails(p, jobs)
 	}
 
 	e := json.NewEncoder(w)
@@ -133,8 +134,8 @@ func (s RestService) listProjects(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get project details and history of jobs
-func (s RestService) getProjectDetails(name string, jobs []*Job) DomainProject {
-	project := DomainProject{Name: name, Jobs: make([]DomainJob, len(jobs))}
+func (s RestService) getProjectDetails(p *Project, jobs []*Job) DomainProject {
+	project := DomainProject{Name: p.name, Jobs: make([]DomainJob, len(jobs)), Params: p.params}
 	for j, b := range jobs {
 		status := b.Status()
 		if s.c.IsBeingBuilt(b) {
@@ -152,14 +153,16 @@ func (s RestService) listProject(projectName string, w http.ResponseWriter, r *h
 		return
 	}
 
-	jobs, err := s.c.ListJobs(s.c.OpenProject(projectName))
+	p := s.c.OpenProject(projectName)
+	p.LoadParams()
+	jobs, err := s.c.ListJobs(p)
 	if err != nil {
 		s.message(w, "could not list jobs", http.StatusInternalServerError)
 		return
 	}
 
 	e := json.NewEncoder(w)
-	e.Encode(s.getProjectDetails(projectName, jobs))
+	e.Encode(s.getProjectDetails(p, jobs))
 }
 
 // Start new job
