@@ -24,7 +24,7 @@ func checkParams(params map[string]string) map[string]string {
 // Saves params into file in expected format
 func saveParams(path string, params map[string]string) error {
 	if params != nil {
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0644)
+		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			return err
 		}
