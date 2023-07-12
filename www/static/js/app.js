@@ -126,7 +126,6 @@ function initApp(name) {
 							params[key] = val;
 						}
 					});
-					context.toggleConfig();
 				}
 			}
 
