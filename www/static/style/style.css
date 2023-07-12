@@ -190,7 +190,7 @@ body {
 .project .top-panel .project-config .param-line input[type="text"] {
 	background: transparent;
 	border: 0;
-	border-bottom: thin solid #999;
+	border-bottom: thin solid #AAA;
 	color: #555;
 	font-size: 0.8125rem;
 	margin: 0.125rem;
