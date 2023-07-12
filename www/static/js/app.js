@@ -7,9 +7,9 @@ function initApp(name) {
 		context.loadHistory = () => {
 			$.get(appUrl + "/projects/" + context.projectName, {
 				success: data => {
-					var history = JSON.parse(data);
-					var shouldRefresh = (history.jobs.length != context.history.length || (history.jobs.length > 0 && context.history.length > 0 && history.jobs[0].status != context.history[0].status));
-					context.history = history.jobs;
+					var detail = JSON.parse(data);
+					var shouldRefresh = (detail.jobs.length != context.history.length || (detail.jobs.length > 0 && context.history.length > 0 && detail.jobs[0].status != context.history[0].status));
+					context.history = detail.jobs;
 					if (context.history.length > 0) {
 						context.status = context.history[0].status;
 						context.showJob(undefined, context.history[0].name);
@@ -17,6 +17,14 @@ function initApp(name) {
 							context.setOutputCollapsed(false);
 						}
 					}
+
+					context.removeAllParams();
+
+					for (const key in detail.params) {
+						context.addParamLine(undefined, key, detail.params[key]);
+					}
+					context.addParamLine();
+
 					if (shouldRefresh) {
 						context.refresh();
 					}
@@ -101,14 +109,29 @@ function initApp(name) {
 				event.stopPropagation();
 			}
 
+			var params = {};
 			var action = appUrl + "/jobs/" + context.projectName + "/";
 			if (context.status == 'inprogress') {
 				action += "interrupt/" + context.history[0].name
 			} else {
 				action += "start"
+
+				var configEl = $(context.rootElement).find('.project-config');
+				if (!configEl.hasClass('collapsed')) {
+					configEl.find('.param-line').each((i, el) => {
+						var key = $(el).find('[name="key"]').val()
+						var val = $(el).find('[name="value"]').val()
+
+						if (key != '') {
+							params[key] = val;
+						}
+					});
+					context.toggleConfig();
+				}
 			}
 
 			$.post(action, {
+				data: {'params': params},
 				success: data => {
 					setTimeout(() => {context.loadHistory();}, 500);
 				}
@@ -198,6 +221,90 @@ function initApp(name) {
 			var link = $('<a href="' + context.artifactDownloadUrl() + '"></a>');
 			link.click();
 			link.remove();
+		};
+
+		context.toggleConfig = (event) => {
+			if (event != undefined) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			var configEl = $(context.rootElement).find('.project-config');
+			if (configEl.hasClass('collapsed')) {
+				configEl.removeClass('collapsed');
+				context.fixConfigHeight(configEl);
+			} else {
+				configEl.addClass('collapsed');
+				configEl.prop('style', 'height: 0');
+			}
+		};
+
+		context.fixConfigHeight = (configEl) => {
+			var totalHeight = 0;
+			$(".project-config > *").each(function(i, el){
+				totalHeight += el.offsetHeight;
+			});
+
+			if (!configEl.hasClass('collapsed')) {
+				configEl.prop('style', 'height: ' + totalHeight + 'px;');
+			}
+		};
+
+		context.addParamLine = (event, key, value) => {
+			if (event != undefined) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			var configEl = $(context.rootElement).find('.project-config');
+
+			var paramLineEl = $('<div class="param-line"></div>').appendTo(configEl);
+			var keyEl = $('<input type="text" name="key" placeholder="Parameter" />').appendTo(paramLineEl);
+			var valueEl = $('<input type="text" name="value" placeholder="Value" />').appendTo(paramLineEl);
+			var removeEl = $('<span class="remove-line"></span>').appendTo(paramLineEl);
+
+			if (key != undefined && key != '') {
+				keyEl.val(key);
+				valueEl.val(value);
+			}
+
+			removeEl.click((event) => {
+				if (event != undefined) {
+					event.preventDefault();
+					event.stopPropagation();
+				}
+				if ((keyEl.val() != undefined && keyEl.val() != '') || (valueEl.val() != undefined && valueEl.val() != '')) {
+					paramLineEl.remove();
+					context.fixConfigHeight(configEl);
+				}
+			});
+
+			paramLineEl.find('input[type=text]').on('keyup', () => {
+				var emptyCounter = 0;
+				var paramLines = configEl.find(".param-line");
+				for (var i = paramLines.length; i >= 0; i--) {
+					var lineKey = $(paramLines[i]).find('input[name="key"]');
+					var lineValue = $(paramLines[i]).find('input[name="value"]');
+					if ((lineKey.val() == undefined || lineKey.val() == '') && (lineValue.val() == undefined || lineValue.val() == '')) {
+						emptyCounter++;
+						if (emptyCounter > 1) {
+							$(paramLines[i]).remove();
+							context.fixConfigHeight(configEl);
+							continue;
+						}
+					}
+				}
+				if ((keyEl.val() != undefined && keyEl.val() != '') || (valueEl.val() != undefined && valueEl.val() != '')) {
+					if (emptyCounter == 0) {
+						context.addParamLine();
+						context.fixConfigHeight(configEl);
+					}
+				}
+			});
+		};
+
+		context.removeAllParams = () => {
+			$(context.rootElement).find('.project-config .param-line').remove();
 		};
 
 		context.loadHistory();

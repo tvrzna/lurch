@@ -21,13 +21,17 @@
 			{{ range .Projects }}
 				<div class="project job-status-empty" ajsf="{{ . }}">
 					<div class="top-panel">
-						<div class="project-name">
-							{{ . }}
-							<span ajsf-text="selectedJob.name | prefix '#'" ajsf-show="selectedJob.name"></span>
+						<div class="project-header">
+							<div class="project-name">
+								{{ . }}
+								<span ajsf-text="selectedJob.name | prefix '#'" ajsf-show="selectedJob.name"></span>
+								<span class="config" ajsf-click="toggleConfig()" title="Run with Parameters"></span>
+							</div>
+							<div class="project-action" ajsf-click="performAction" ajsf-title="actionTitle">
+								<div ajsf-style-class="actionClass"></div>
+							</div>
 						</div>
-						<div class="project-action" ajsf-click="performAction" ajsf-title="actionTitle">
-							<div ajsf-style-class="actionClass"></div>
-						</div>
+						<div class="project-config collapsed" style="height: 0;"></div>
 					</div>
 					<div class="job-panel" ajsf-show="selectedJob.name">
 						<div class="job-title collapsed" ajsf-click="toggleOutputCollapsed">

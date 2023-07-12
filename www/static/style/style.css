@@ -54,12 +54,40 @@ body {
 }
 
 .project .top-panel {
-	align-items: center;
 	background: #fff;
 	border-top-left-radius: 0.5rem;
 	border-top-right-radius: 0.5rem;
-	display: flex;
 	padding: 0.25rem;
+}
+
+.project .config {
+	border-bottom: 0.125rem solid #999;
+	cursor: pointer;
+	display: inline-block;
+	margin-bottom: 0.125rem;
+	width: 1rem;
+}
+
+.project .config::before, .project .config::after {
+	background: #999;
+	content: '';
+	display: block;
+	height: 0.125rem;
+	margin-bottom: 0.1875rem;
+	width: 1rem;
+}
+
+.project .config:hover {
+	border-bottom-color: #333;
+}
+
+.project .config:hover::before, .project .config:hover::after {
+	background: #333;
+}
+
+.project .top-panel .project-header {
+	align-items: center;
+	display: flex;
 }
 
 .project.job-status-empty .top-panel {
@@ -147,6 +175,74 @@ body {
 	border-radius: .125rem;
 	height: 0;
 	width: 0;
+}
+
+.project .top-panel .project-config {
+	overflow: hidden;
+	transition: height 0.125s linear;
+}
+
+.project .top-panel .project-config .param-line {
+	align-items: center;
+	display: flex;
+}
+
+.project .top-panel .project-config .param-line input[type="text"] {
+	background: transparent;
+	border: 0;
+	border-bottom: thin solid #999;
+	color: #555;
+	font-size: 0.8125rem;
+	margin: 0.125rem;
+	margin-bottom: 0.25rem;
+	outline: 0;
+}
+
+.project .top-panel .project-config .param-line input[type="text"]::placeholder {
+	color: #aaa;
+}
+
+.project .top-panel .project-config .param-line input[type="text"]:focus {
+	border-bottom-color: #333;
+	color: #333;
+}
+
+.project .top-panel .project-config .param-line input[name="key"] {
+	flex: 1;
+}
+
+.project .top-panel .project-config .param-line input[name="value"] {
+	flex: 3;
+}
+
+.project .top-panel .project-config .remove-line {
+	cursor: pointer;
+	display: inline-block;
+	height: 1rem;
+	position: relative;
+	width: 1rem;
+}
+
+.project .top-panel .project-config .remove-line::before, .project .top-panel .project-config .remove-line::after {
+	background: #999;
+	content: '';
+	display: inline-block;
+	height: 0.125rem;
+	position: absolute;
+	top: 0.375rem;
+	width: 1rem;
+}
+
+.project .top-panel .project-config .remove-line:hover::before, .project .top-panel .project-config .remove-line:hover::after {
+	background-color: #333;
+}
+
+.project .top-panel .project-config .remove-line::before {
+	transform: rotate(45deg);
+}
+
+.project .top-panel .project-config .remove-line::after {
+	transform: rotate(-45deg);
 }
 
 .project .history-panel {
