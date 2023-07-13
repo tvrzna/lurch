@@ -210,7 +210,7 @@ func (c *Context) ListProjects() ([]*Project, error) {
 	}
 	for _, e := range entries {
 		if e.IsDir() {
-			result = append(result, &Project{name: e.Name(), dir: filepath.Join(c.conf.path, e.Name())})
+			result = append(result, c.OpenProject(e.Name()))
 		}
 	}
 
@@ -233,7 +233,7 @@ func (c *Context) ListJobs(p *Project) ([]*Job, error) {
 	}
 	for _, e := range entries {
 		if e.IsDir() {
-			result = append(result, &Job{name: e.Name(), dir: filepath.Join(p.dir, e.Name()), p: p})
+			result = append(result, c.OpenJob(p, e.Name()))
 		}
 	}
 
