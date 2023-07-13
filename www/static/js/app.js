@@ -156,7 +156,7 @@ function initApp(name) {
 						msg += ' with parameters'
 					}
 					context.showMessage('info', msg);
-					setTimeout(() => {context.loadHistory();}, 500);
+					context.loadHistory();
 				},
 				error: () => {
 					context.showMessage('error', 'Could not ' + actionName + ' ' + context.projectName);
