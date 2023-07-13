@@ -4,6 +4,20 @@ function initApp(name) {
 
 		context.history = [];
 
+		context.showMessage = (type, message) => {
+			var messageDiv = $("<div>" + message + "</div>")
+				.attr('class', 'message ' + type)
+				.appendTo($("#messageBox"));
+
+			messageDiv.click(() => {
+				messageDiv.remove();
+			});
+
+			setTimeout(() => {
+				messageDiv.remove();
+			}, 3000);
+		};
+
 		context.loadHistory = () => {
 			$.get(appUrl + "/projects/" + context.projectName, {
 				success: data => {
@@ -28,6 +42,9 @@ function initApp(name) {
 					if (shouldRefresh) {
 						context.refresh();
 					}
+				},
+				error: () => {
+					context.showMessage('error', 'Could not load ' + context.projectName);
 				}
 			});
 		};
@@ -111,8 +128,10 @@ function initApp(name) {
 
 			var params = {};
 			var action = appUrl + "/jobs/" + context.projectName + "/";
+			var actionName = "start";
 			if (context.status == 'inprogress') {
 				action += "interrupt/" + context.history[0].name
+				actionName = "interrupt";
 			} else {
 				action += "start"
 
@@ -132,7 +151,15 @@ function initApp(name) {
 			$.post(action, {
 				data: {'params': params},
 				success: data => {
+					var msg = context.projectName + ' ' + actionName + 'ed';
+					if (actionName == 'start' && Object.keys(params).length > 0) {
+						msg += ' with parameters'
+					}
+					context.showMessage('info', msg);
 					setTimeout(() => {context.loadHistory();}, 500);
+				},
+				error: () => {
+					context.showMessage('error', 'Could not ' + actionName + ' ' + context.projectName);
 				}
 			});
 		};
@@ -192,6 +219,9 @@ function initApp(name) {
 					rootEl.attr('class', 'project job-status-' + job.status);
 					context.refresh();
 					rootEl.find('pre')[0].scrollTop = rootEl.find('pre')[0].scrollHeight;
+				},
+				error: () => {
+					context.showMessage('error', 'Could not load job #' + jobNo + ' from ' + context.projectName);
 				}
 			});
 

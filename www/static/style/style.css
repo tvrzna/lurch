@@ -380,6 +380,43 @@ body {
 	transition-property: height, padding;
 }
 
+#messageBox {
+	bottom: 1rem;
+	right: 1rem;
+	position: fixed;
+	width: 30rem;
+	z-index: 2;
+}
+
+#messageBox .message {
+	background-color: #FFFFFF;
+	border: .0625rem solid #000000;
+	border-radius: .25rem;
+	cursor: pointer;
+	margin-bottom: .25rem;
+	opacity: .8;
+	padding: 1rem;
+}
+
+#messageBox .message:hover {
+	opacity: 1;
+}
+
+#messageBox .message.info {
+	background-color: #BBDEFB;
+	border-color: #2196F3;
+}
+
+#messageBox .message.warn {
+	background-color: #FFECB3;
+	border-color: #FFC107;
+}
+
+#messageBox .message.error {
+	background-color: #ffcdd2;
+	border-color: #ef9a9a;
+}
+
 @media (max-width: 1040px) {
 	#header {
 		padding: 0.5rem 0.25rem;
@@ -397,5 +434,12 @@ body {
 
 	.project {
 		width: 98%;
+	}
+
+	#messageBox {
+		bottom: 1rem;
+		left: .25rem;
+		right: .25rem;
+		width: auto;
 	}
 }
