@@ -133,8 +133,7 @@ func (c *Context) start(b *Job) {
 }
 
 func (c *Context) setEnv(cmd *exec.Cmd, b *Job) {
-	envs := make([]string, 1)
-	envs = append(envs, fmt.Sprintf("PATH=%s", os.Getenv("PATH")))
+	envs := os.Environ()
 
 	if b.params != nil {
 		for k, v := range b.params {
