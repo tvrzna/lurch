@@ -4,11 +4,11 @@
 		<title>lurch</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-		<link rel="stylesheet" type="text/css" href="{{.UrlFor "static/style/style.css" }}" />
-		<script type="text/javascript" src="{{.UrlFor "static/js/nunjs.min.js" }}"></script>
-		<script type="text/javascript" src="{{.UrlFor "static/js/ajsf.min.js" }}"></script>
+		<link rel="stylesheet" type="text/css" href='{{.UrlFor "static/style/style.css" }}' />
+		<script type="text/javascript" src='{{.UrlFor "static/js/nunjs.min.js" }}'></script>
+		<script type="text/javascript" src='{{.UrlFor "static/js/ajsf.min.js" }}'></script>
 		<script type="text/javascript">
-			const appUrl = "{{$.UrlFor "rest"}}";
+			const appUrl = '{{$.UrlFor "rest"}}';
 		</script>
 	</head>
 	<body>
@@ -62,6 +62,6 @@
 			{{ end }}
 		</div>
 		<div id="messageBox"></div>
-		<script type="text/javascript" src="{{.UrlFor "static/js/app.js" }}"></script>
+		<script type="text/javascript" src='{{.UrlFor "static/js/app.js" }}'></script>
 	</body>
 </html>
