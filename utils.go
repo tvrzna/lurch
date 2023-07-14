@@ -31,7 +31,7 @@ func saveParams(path string, params map[string]string) error {
 		defer file.Close()
 
 		for k, v := range params {
-			if _, err := file.WriteString(fmt.Sprintf("%s=%s\n", k, v)); err != nil {
+			if _, err := file.WriteString(fmt.Sprintf("%s=%s\n", k, strings.ReplaceAll(strings.ReplaceAll(v, "\r", "\\r"), "\n", "\\n"))); err != nil {
 				return err
 			}
 		}
@@ -53,7 +53,7 @@ func loadParams(path string) map[string]string {
 		line := strings.TrimSpace(scanner.Text())
 		splitIndex := strings.Index(line, "=")
 		if splitIndex >= 0 {
-			result[line[:splitIndex]] = line[splitIndex+1:]
+			result[line[:splitIndex]] = strings.ReplaceAll(strings.ReplaceAll(line[splitIndex+1:], "\\\r", "\r"), "\\\n", "\n")
 		}
 	}
 	return result
