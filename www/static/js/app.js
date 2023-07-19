@@ -270,7 +270,7 @@ function initApp(name) {
 
 		context.fixConfigHeight = (configEl) => {
 			var totalHeight = 0;
-			$(".project-config > *").each(function(i, el){
+			configEl.find(".project-config > *").each(function(i, el){
 				totalHeight += el.offsetHeight;
 			});
 
