@@ -5,13 +5,10 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
-
-var envVariableFormat = regexp.MustCompile(`[a-zA-Z_]+[a-zA-Z0-9_]+`)
 
 type JobStatus byte
 

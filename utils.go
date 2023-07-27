@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
+
+var envVariableFormat = regexp.MustCompile(`[a-zA-Z_]+[a-zA-Z0-9_]+`)
 
 // Checks and return params in expected format, exclude all params with incorrect format
 func checkParams(params map[string]string) map[string]string {
