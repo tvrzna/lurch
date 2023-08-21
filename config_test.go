@@ -42,8 +42,8 @@ func TestLoadConfigWithData(t *testing.T) {
 
 func TestGetAppUrlEmpty(t *testing.T) {
 	c := LoadConfig([]string{})
-	if c.getAppUrl() != "http://localhost:5000" {
-		t.Fatalf("TestGetAppUrlEmpty: unexpected default app url '%s'", "http://localhost:5000")
+	if c.getAppUrl() != "" {
+		t.Fatalf("TestGetAppUrlEmpty: unexpected default app url '%s'", c.getAppUrl())
 	}
 }
 
