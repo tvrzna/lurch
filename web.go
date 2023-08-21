@@ -39,6 +39,9 @@ type PageContext struct {
 }
 
 func (p *PageContext) UrlFor(path string) string {
+	if p.s.c.conf.getAppUrl() == "" {
+		return path
+	}
 	return p.s.c.conf.getAppUrl() + "/" + path
 }
 

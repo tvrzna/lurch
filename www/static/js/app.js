@@ -236,7 +236,7 @@ function initApp(name) {
 
 		context.artifactDownloadUrl = () => {
 			if (context.selectedJob != undefined && context.selectedJob.name != undefined) {
-				return appUrl.replace('/rest', '') + "/download/" + context.projectName + "/" + context.selectedJob.name;
+				return appUrl.replace('rest', '') + "download/" + context.projectName + "/" + context.selectedJob.name;
 			}
 			else "";
 		};

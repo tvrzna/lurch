@@ -70,9 +70,6 @@ func parseArgs(args []string, handler func(arg, nextArg string)) {
 }
 
 func (c *Config) getAppUrl() string {
-	if c.appUrl == "" {
-		return "http://" + c.getServerUri()
-	}
 	return c.appUrl
 }
 
