@@ -140,6 +140,14 @@ body {
 	font-weight: normal;
 }
 
+.project .top-panel .project-status {
+	border-radius: 50%;
+	display: inline-block;
+	height: 1rem;
+	opacity: 0.5;
+	width: 1rem;
+}
+
 .project .top-panel .project-action:hover {
 	filter: opacity(1);
 	box-shadow: 0 0 0.25rem #999;
@@ -282,19 +290,19 @@ body {
 	width: 0.25rem;
 }
 
-.project .history-panel li span.job-status-finished::after {
+.project .history-panel li span.job-status-finished::after, .project.job-status-finished .project-status {
 	background-color: #4caf50;
 }
 
-.project .history-panel li span.job-status-stopped::after {
+.project .history-panel li span.job-status-stopped::after, .project.job-status-stopped .project-status {
 	background-color: #ffc107;
 }
 
-.project .history-panel li span.job-status-failed::after {
+.project .history-panel li span.job-status-failed::after, .project.job-status-failed .project-status {
 	background-color: #f44336;
 }
 
-.project .history-panel li span.job-status-inprogress::after {
+.project .history-panel li span.job-status-inprogress::after, .project.job-status-inprogress .project-status {
 	background-color: #2196f3;
 }
 
