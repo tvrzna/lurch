@@ -306,6 +306,10 @@ body {
 	background-color: #2196f3;
 }
 
+.project .history-panel li span.job-status-unknown::after, .project.job-status-unknown .project-status {
+	background-color: #969696;
+}
+
 .project .job-panel .job-title .indicator {
 	border-bottom: 0 solid transparent;
 	border-left: 0.375rem solid transparent;
