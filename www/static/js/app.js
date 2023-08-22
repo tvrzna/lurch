@@ -1,8 +1,27 @@
 function initApp(name) {
-	var app = ajsf(name, context => {
+	var app = ajsf(name, (context, rootEl) => {
 		context.projectName = name;
-
 		context.history = [];
+		context.loading = 0;
+
+		var loadingOverlay = $(rootEl).find('.loading-overlay');
+
+		context.addLoading = (count) => {
+			if (count == undefined) {
+				count = 1;
+			}
+			context.loading += count;
+
+			if (context.loading > 0) {
+				setTimeout(() => {
+					if (context.loading > 0) {
+						loadingOverlay[0].style.display = 'flex';
+					}
+				}, 150)
+			} else {
+				loadingOverlay[0].style.display = 'none';
+			}
+		};
 
 		context.showMessage = (type, message) => {
 			var messageDiv = $("<div>" + message + "</div>")
@@ -19,6 +38,7 @@ function initApp(name) {
 		};
 
 		context.loadHistory = () => {
+			context.addLoading();
 			$.get(appUrl + "/projects/" + context.projectName, {
 				success: data => {
 					var detail = JSON.parse(data);
@@ -45,6 +65,9 @@ function initApp(name) {
 				},
 				error: () => {
 					context.showMessage('error', 'Could not load ' + context.projectName);
+				},
+				complete: () => {
+					context.addLoading(-1);
 				}
 			});
 		};
@@ -148,6 +171,7 @@ function initApp(name) {
 				}
 			}
 
+			context.addLoading();
 			$.post(action, {
 				data: {'params': params},
 				success: data => {
@@ -160,6 +184,9 @@ function initApp(name) {
 				},
 				error: () => {
 					context.showMessage('error', 'Could not ' + actionName + ' ' + context.projectName);
+				},
+				complete: () => {
+					context.addLoading(-1);
 				}
 			});
 		};
@@ -200,6 +227,7 @@ function initApp(name) {
 				event.stopPropagation();
 			}
 
+			context.addLoading();
 			$.get(appUrl + "/jobs/" + context.projectName + "/" + jobNo, {
 				success: data => {
 					var job = JSON.parse(data);
@@ -222,6 +250,9 @@ function initApp(name) {
 				},
 				error: () => {
 					context.showMessage('error', 'Could not load job #' + jobNo + ' from ' + context.projectName);
+				},
+				complete: () => {
+					context.addLoading(-1);
 				}
 			});
 
