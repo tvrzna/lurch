@@ -417,8 +417,8 @@ body {
 	margin: 0;
 	overflow: auto;
 	padding: 0.25rem;
-	text-wrap: balance;
 	transition: height 0.125s linear;
+	white-space: pre-wrap;
 	word-wrap: break-word;
 }
 
