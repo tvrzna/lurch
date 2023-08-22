@@ -56,15 +56,18 @@ body {
 
 .project .loading-overlay {
 	align-items: center;
-	background-color: #cccccc60;
+	background-color: #00000060;
 	border-radius: 0.4rem;
 	bottom: 0;
 	display: none;
+	height: 3rem;
 	justify-content: center;
 	left: 0;
+	margin: auto;
 	position: absolute;
 	right: 0;
 	top: 0;
+	width: 4rem;
 	z-index: 1;
 }
 

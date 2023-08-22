@@ -20,6 +20,7 @@ function initApp(name) {
 				}, 150)
 			} else {
 				loadingOverlay[0].style.display = 'none';
+				context.loading = 0;
 			}
 		};
 
@@ -45,6 +46,10 @@ function initApp(name) {
 					var shouldRefresh = (detail.jobs.length != context.history.length || (detail.jobs.length > 0 && context.history.length > 0 && detail.jobs[0].status != context.history[0].status));
 					context.history = detail.jobs;
 					if (context.history.length > 0) {
+						if (context.selectedJob == undefined) {
+							var rootEl = $(context.rootElement);
+							rootEl.attr('class', 'project job-status-' + context.history[0].status);
+						}
 						context.status = context.history[0].status;
 						context.showJob(undefined, context.history[0].name);
 						if (context.status == "inprogress") {
@@ -221,19 +226,21 @@ function initApp(name) {
 			context.setOutputCollapsed(!$(context.rootElement).find('.job-title').hasClass('collapsed'));
 		}
 
-		context.showJob = (event, jobNo) => {
+		context.showJob = (event, jobNo, el, hideLoading) => {
 			if (event != undefined) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
 
-			context.addLoading();
+			if (hideLoading == undefined || !hideLoading) {
+				context.addLoading();
+			}
 			$.get(appUrl + "/jobs/" + context.projectName + "/" + jobNo, {
 				success: data => {
 					var job = JSON.parse(data);
 					if (job.status == "inprogress") {
 						setTimeout(() => {
-							context.showJob(event, jobNo);
+							context.showJob(event, jobNo, undefined, true);
 						}, 1000);
 					} else if (context.selectedJob != undefined && context.selectedJob.status == "inprogress" && job.status != "inprogress") {
 						context.loadHistory();
@@ -243,7 +250,6 @@ function initApp(name) {
 						context.setOutputCollapsed(false);
 					}
 					var rootEl = $(context.rootElement);
-
 					rootEl.attr('class', 'project job-status-' + job.status);
 					context.refresh();
 					rootEl.find('pre')[0].scrollTop = rootEl.find('pre')[0].scrollHeight;
@@ -252,7 +258,9 @@ function initApp(name) {
 					context.showMessage('error', 'Could not load job #' + jobNo + ' from ' + context.projectName);
 				},
 				complete: () => {
-					context.addLoading(-1);
+					if (hideLoading == undefined || !hideLoading) {
+						context.addLoading(-1);
+					}
 				}
 			});
 
