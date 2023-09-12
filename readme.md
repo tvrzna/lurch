@@ -38,7 +38,9 @@ rm -rf .git/
 - [x] Core
 - [x] REST API
 - [x] Web UI
-- [ ] Build parameters passed as environmentals
-- [ ] System health info (CPU/Memory/Free space/...?)
-- [ ] CLI
+- [X] Build parameters passed as environmentals
+- [ ] Hide dot project (e.g. `.ignored-project`)
+- [ ] Dark theme
+- [ ] Custom name of application
+- [ ] System log into output (e.g. when job is started or finished + its duration)
 - [ ] Periodical watcher (running custom script saving state of last check)
