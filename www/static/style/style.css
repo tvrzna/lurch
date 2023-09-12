@@ -344,7 +344,7 @@ body {
 	background-color: #2196f3;
 }
 
-.project .history-panel li span.job-status-unknown::after, .project.job-status-unknown .project-status {
+.project .history-panel li span.job-status-unknown::after, .project.job-status-unknown .project-status, .project.job-status-empty .project-status {
 	background-color: #969696;
 }
 
