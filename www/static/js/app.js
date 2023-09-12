@@ -404,7 +404,7 @@ ajsf("lurch-settings", context => {
 	const themeItemName = "lurch.theme";
 
 	context.switchTheme = () => {
-		var currentTheme = sessionStorage.getItem(themeItemName);
+		var currentTheme = localStorage.getItem(themeItemName);
 		context.setTheme(currentTheme == "dark" ? "light" : "dark");
 	};
 
@@ -414,8 +414,8 @@ ajsf("lurch-settings", context => {
 		} else {
 			$('body').removeAttr("id");
 		}
-		sessionStorage.setItem(themeItemName, theme);
+		localStorage.setItem(themeItemName, theme);
 	};
 
-	context.setTheme(sessionStorage.getItem(themeItemName));
+	context.setTheme(localStorage.getItem(themeItemName));
 });
