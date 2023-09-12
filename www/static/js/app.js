@@ -393,8 +393,29 @@ function initApp(name) {
 	});
 }
 
-
 $('[ajsf]').each((i, el) => {
 	var appName = $(el).attr('ajsf');
-	initApp(appName);
+	if (appName != "lurch-settings") {
+		initApp(appName);
+	}
+});
+
+ajsf("lurch-settings", context => {
+	const themeItemName = "lurch.theme";
+
+	context.switchTheme = () => {
+		var currentTheme = sessionStorage.getItem(themeItemName);
+		context.setTheme(currentTheme == "dark" ? "light" : "dark");
+	};
+
+	context.setTheme = (theme) => {
+		if (theme == "dark") {
+			$('body').attr("id", "dark");
+		} else {
+			$('body').removeAttr("id");
+		}
+		sessionStorage.setItem(themeItemName, theme);
+	};
+
+	context.setTheme(sessionStorage.getItem(themeItemName));
 });

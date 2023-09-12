@@ -12,10 +12,12 @@
 		</script>
 	</head>
 	<body>
-		<div id="header">
+		<div id="header" ajsf="lurch-settings">
 			<h1>lurch</h1>
-			<h2>{{ .ProjectVersion }}</h2>
-			<a href="https://github.com/tvrzna/lurch" target="_blank">github.com/tvrzna/lurch</a>
+			<div class="switch-theme" ajsf-click="switchTheme">
+				<span class="light"></span>
+				<span class="dark"></span>
+			</div>
 		</div>
 		<div id="wrapper">
 			{{ range .Projects }}
@@ -63,6 +65,7 @@
 				</div>
 			{{ end }}
 		</div>
+		<div id="footer">Powered by <a href="https://github.com/tvrzna/lurch" target="_blank">lurch</a> {{.ProjectVersion}}</div>
 		<div id="messageBox"></div>
 		<script type="text/javascript" src='{{.UrlFor "static/js/app.js" }}'></script>
 	</body>
