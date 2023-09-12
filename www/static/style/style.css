@@ -536,6 +536,7 @@ body#dark {
 
 #messageBox {
 	bottom: 1rem;
+	color: #333;
 	right: 1rem;
 	position: fixed;
 	width: 30rem;
