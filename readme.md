@@ -35,10 +35,10 @@ rm -rf .git/
 4. Open lurch in browser and start the job.
 
 ## Roadmap
-- [x] Core
-- [x] REST API
-- [x] Web UI
-- [X] Build parameters passed as environmentals
+- [x] Core (0.1.0)
+- [x] REST API (0.1.0)
+- [x] Web UI (0.1.0)
+- [X] Build parameters passed as environmentals (0.2.0)
 - [ ] Hide dot project (e.g. `.ignored-project`)
 - [ ] Dark theme
 - [ ] Custom name of application
