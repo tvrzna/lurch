@@ -13,6 +13,7 @@ Options:
 	-t, --path [PATH]		absolute path to work dir
 	-p, --port [PORT]		sets port for listening
 	-a, --app-url [APP_URL]		application url (if behind proxy)
+	-n, --name [NAME]		name of application to be displayed
 ```
 
 ## How to setup project

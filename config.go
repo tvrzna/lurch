@@ -17,10 +17,11 @@ type Config struct {
 	port   int
 	appUrl string
 	path   string
+	name   string
 }
 
 func LoadConfig(args []string) *Config {
-	c := &Config{port: 5000}
+	c := &Config{port: 5000, name: "lurch"}
 	c.setPath("workdir")
 	parseArgs(args, func(arg, value string) {
 		switch arg {
@@ -30,8 +31,10 @@ func LoadConfig(args []string) *Config {
 			c.setPath(value)
 		case "-a", "--app-url":
 			c.appUrl = value
+		case "-n", "--name":
+			c.name = value
 		case "-h", "--help":
-			fmt.Printf("Usage: lurch [options]\nOptions:\n\t-h, --help\t\t\tprint this help\n\t-v, --version\t\t\tprint version\n\t-t, --path [PATH]\t\tabsolute path to work dir\n\t-p, --port [PORT]\t\tsets port for listening\n\t-a, --app-url [APP_URL]\t\tapplication url (if behind proxy)\n")
+			fmt.Printf("Usage: lurch [options]\nOptions:\n\t-h, --help\t\t\tprint this help\n\t-v, --version\t\t\tprint version\n\t-t, --path [PATH]\t\tabsolute path to work dir\n\t-p, --port [PORT]\t\tsets port for listening\n\t-a, --app-url [APP_URL]\t\tapplication url (if behind proxy)\n\t-n, --name [NAME]\t\tname of application to be displayed\n")
 			os.Exit(0)
 		case "-v", "--version":
 			fmt.Printf("lurch %s\nhttps://github.com/tvrzna/lurch\n\nReleased under the MIT License.\n", c.GetVersion())
