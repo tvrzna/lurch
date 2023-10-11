@@ -151,6 +151,10 @@ body#dark {
 	z-index: 1;
 }
 
+.project.maximized {
+	z-index: 2;
+}
+
 .project .loading-overlay {
 	align-items: center;
 	background-color: #00000060;
@@ -452,6 +456,10 @@ body#dark {
 	background-color: #969696;
 }
 
+.project.project.maximized .job-panel .job-title .indicator {
+	display: none !important;
+}
+
 .project .job-panel .job-title .indicator {
 	border-bottom: 0 solid transparent;
 	border-left: 0.375rem solid transparent;
@@ -459,6 +467,7 @@ body#dark {
 	border-top: 0.375rem solid var(--fg-job-title);
 	display: inline-block;
 	height: 0;
+	margin-left: 0.5rem;
 	width: 0;
 	transition: transform 0.125s linear;
 }
@@ -468,7 +477,7 @@ body#dark {
 }
 
 .project .job-panel .job-title {
-	align-items: baseline;
+	align-items: center;
 	color: var(--fg-job-title);
 	cursor: pointer;
 	background: var(--color-dark);
@@ -513,6 +522,78 @@ body#dark {
 	text-decoration: underline;
 }
 
+.project .job-panel .job-output {
+	position: relative;
+}
+
+.project.maximized .job-panel {
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	left: 0;
+	position: fixed !important;
+	right: 0;
+	top: 0;
+	z-index: 2;
+}
+
+.project.maximized .job-panel .job-output {
+	flex: 1;
+}
+
+.project.maximized .job-panel .job-output pre {
+	bottom: 0;
+	left: 0;
+	height: auto !important;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 2;
+}
+
+.project .job-panel .job-title .resize {
+	display: block;
+	cursor: pointer;
+	height: 0.75rem;
+	position: relative;
+	width: 0.75rem;
+}
+
+.project .job-panel .job-title .resize::before, .project .job-panel .job-title .resize::after {
+	border-right: thin solid var(--fg-job-title);
+	border-top: thin solid var(--fg-job-title);
+	content: ' ';
+	display: block;
+	height: 0.25rem;
+	position: absolute;
+	width: 0.25rem;
+}
+
+.project .job-panel .job-title .resize::before {
+	right: 0.0675rem;
+	top: 0.0675rem;
+}
+
+.project .job-panel .job-title .resize::after {
+	bottom: 0.0675rem;
+	left: 0.0675rem;
+	transform: rotate(180deg);
+}
+
+.project.maximized .job-panel .job-title .resize::before {
+	bottom: 0;
+	left: 0;
+	right: auto;
+	top: auto;
+}
+
+.project.maximized .job-panel .job-title .resize::after {
+	bottom: auto;
+	left: auto;
+	right: 0;
+	top: 0;
+}
+
 .project .job-panel .job-output pre {
 	background-color: #002B36;
 	color: #eee;
@@ -524,6 +605,10 @@ body#dark {
 	transition: height 0.125s linear;
 	white-space: pre-wrap;
 	word-wrap: break-word;
+}
+
+.project .job-panel .job-title.collapsed .resize {
+	display: none;
 }
 
 .project .job-panel .job-output.collapsed  pre {

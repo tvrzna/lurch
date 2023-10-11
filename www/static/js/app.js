@@ -48,7 +48,7 @@ function initApp(name) {
 					if (context.history.length > 0) {
 						if (context.selectedJob == undefined) {
 							var rootEl = $(context.rootElement);
-							rootEl.attr('class', 'project job-status-' + context.history[0].status);
+							rootEl.attr('class', 'project job-status-' + context.history[0].status + (rootEl.hasClass('maximized') ? ' maximized': ''));
 						}
 						context.status = context.history[0].status;
 						context.showJob(undefined, context.history[0].name);
@@ -223,7 +223,26 @@ function initApp(name) {
 				event.stopPropagation();
 			}
 
-			context.setOutputCollapsed(!$(context.rootElement).find('.job-title').hasClass('collapsed'));
+			let el = $(rootEl);
+			if (el.hasClass('maximized')) {
+				return;
+			}
+
+			context.setOutputCollapsed(!el.find('.job-title').hasClass('collapsed'));
+		}
+
+		context.maximize = (event) => {
+			if (event != undefined) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			let el = $(rootEl);
+			if (el.hasClass('maximized')) {
+				el.removeClass('maximized');
+			} else {
+				el.addClass('maximized');
+			}
 		}
 
 		context.showJob = (event, jobNo, el, hideLoading) => {
@@ -250,7 +269,7 @@ function initApp(name) {
 						context.setOutputCollapsed(false);
 					}
 					var rootEl = $(context.rootElement);
-					rootEl.attr('class', 'project job-status-' + job.status);
+					rootEl.attr('class', 'project job-status-' + job.status + (rootEl.hasClass('maximized') ? ' maximized' : ''));
 					context.refresh();
 					rootEl.find('pre')[0].scrollTop = rootEl.find('pre')[0].scrollHeight;
 				},
