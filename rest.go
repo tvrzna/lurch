@@ -154,6 +154,10 @@ func (s RestService) listProject(projectName string, w http.ResponseWriter, r *h
 	}
 
 	p := s.c.OpenProject(projectName)
+	if p == nil {
+		s.message(w, "could not list jobs", http.StatusInternalServerError)
+		return
+	}
 	p.LoadParams()
 	jobs, err := s.c.ListJobs(p)
 	if err != nil {
@@ -190,6 +194,9 @@ func (s RestService) interruptJob(projectName, jobNumber string, w http.Response
 	}
 
 	b := s.c.OpenJob(s.c.OpenProject(projectName), jobNumber)
+	if b == nil {
+		s.message(w, "job could not be interrupted", http.StatusBadRequest)
+	}
 	s.c.Interrupt(b)
 
 	s.message(w, "job interrupted", http.StatusOK)
@@ -203,6 +210,10 @@ func (s RestService) jobDetail(projectName, jobNumber string, w http.ResponseWri
 	}
 
 	b := s.c.OpenJob(s.c.OpenProject(projectName), jobNumber)
+	if b == nil {
+		s.message(w, "could not get job detail", http.StatusBadRequest)
+		return
+	}
 
 	status := b.Status()
 	if s.c.IsBeingBuilt(b) {

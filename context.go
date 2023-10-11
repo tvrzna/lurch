@@ -31,6 +31,9 @@ func NewContext(c *Config) *Context {
 }
 
 func (c *Context) StartJob(p *Project, params map[string]string) string {
+	if p == nil {
+		return ""
+	}
 	// Check if project is being built
 	if c.isProjectBeingBuilt(p) {
 		return ""
@@ -208,7 +211,7 @@ func (c *Context) ListProjects() ([]*Project, error) {
 		return nil, err
 	}
 	for _, e := range entries {
-		if e.IsDir() {
+		if e.IsDir() && !strings.HasPrefix(e.Name(), ".") {
 			result = append(result, c.OpenProject(e.Name()))
 		}
 	}
@@ -221,6 +224,9 @@ func (c *Context) ListProjects() ([]*Project, error) {
 }
 
 func (c *Context) OpenProject(name string) *Project {
+	if strings.HasPrefix(name, ".") {
+		return nil
+	}
 	return &Project{name: name, dir: filepath.Join(c.conf.path, name)}
 }
 
@@ -246,6 +252,9 @@ func (c *Context) ListJobs(p *Project) ([]*Job, error) {
 }
 
 func (c *Context) OpenJob(p *Project, name string) *Job {
+	if p == nil {
+		return nil
+	}
 	return &Job{name: name, dir: filepath.Join(p.dir, name), p: p}
 }
 
