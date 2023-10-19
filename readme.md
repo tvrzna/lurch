@@ -40,8 +40,9 @@ rm -rf .git/
 - [x] REST API (0.1.0)
 - [x] Web UI (0.1.0)
 - [X] Build parameters passed as environmentals (0.2.0)
-- [ ] Hide dot project (e.g. `.ignored-project`)
-- [ ] Dark theme
-- [ ] Custom name of application
-- [ ] System log into output (e.g. when job is started or finished + its duration)
+- [X] Hide dot project (e.g. `.ignored-project`) (0.3.0)
+- [X] Dark theme (0.3.0)
+- [X] Custom name of application (0.3.0)
 - [ ] Periodical watcher (running custom script saving state of last check)
+- [ ] Pipelining (jobs started according the result status)
+- [ ] Size and existance of artifact
