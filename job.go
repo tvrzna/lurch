@@ -148,3 +148,11 @@ func (b *Job) SaveParams() error {
 func (b *Job) LoadParams() {
 	b.params = loadParams(filepath.Join(b.dir, "params"))
 }
+
+func (b *Job) ArtifactSize() int64 {
+	stat, err := os.Stat(b.ArtifactPath())
+	if err != nil {
+		return -1
+	}
+	return stat.Size()
+}

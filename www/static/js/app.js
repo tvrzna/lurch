@@ -299,6 +299,17 @@ function initApp(name) {
 			else "";
 		};
 
+		context.artifactExists = () => {
+			return context.selectedJob != undefined && context.selectedJob.artifactSize != undefined && context.selectedJob.artifactSize > 0;
+		};
+
+		context.artifactSize = () => {
+			if (context.selectedJob != undefined && context.selectedJob.artifactSize != undefined && context.selectedJob.artifactSize > 0) {
+				return context.selectedJob.artifactSize.toFixed(2) + ' ' + context.selectedJob.artifactUnit + 'B';
+			}
+			return "";
+		}
+
 		context.downloadArtifact = (event) => {
 			if (event != undefined) {
 				event.preventDefault();

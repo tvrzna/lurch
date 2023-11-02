@@ -9,6 +9,7 @@ import (
 	"mime"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -96,6 +97,7 @@ func (s *WebService) downloadArtifact(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("content-type", s.getMimeType(j.ArtifactPath()))
 		w.Header().Set("content-disposition", fmt.Sprintf("attachment; filename=\"%s_%s.tar.gz\"", p.name, j.name))
+		w.Header().Set("content-length", strconv.FormatInt(j.ArtifactSize(), 10))
 
 		w.WriteHeader(http.StatusOK)
 		io.Copy(w, f)

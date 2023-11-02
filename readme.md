@@ -45,4 +45,4 @@ rm -rf .git/
 - [X] Custom name of application (0.3.0)
 - [ ] Periodical watcher (running custom script saving state of last check)
 - [ ] Pipelining (jobs started according the result status)
-- [ ] Size and existance of artifact
+- [X] Size and existance of artifact

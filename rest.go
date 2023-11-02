@@ -23,17 +23,44 @@ type DomainProject struct {
 }
 
 type DomainJob struct {
-	Name      string            `json:"name"`
-	Status    JobStatus         `json:"status"`
-	StartDate time.Time         `json:"startDate"`
-	EndDate   time.Time         `json:"endDate"`
-	Output    string            `json:"output,omitempty"`
-	Params    map[string]string `json:"params,omitempty"`
+	Name         string            `json:"name"`
+	Status       JobStatus         `json:"status"`
+	StartDate    time.Time         `json:"startDate"`
+	EndDate      time.Time         `json:"endDate"`
+	Output       string            `json:"output,omitempty"`
+	Params       map[string]string `json:"params,omitempty"`
+	ArtifactSize float64           `json:"artifactSize,omitempty"`
+	ArtifactUnit MemoryUnit        `json:"artifactUnit"`
 }
 
 type DomainStatus struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
+}
+
+type MemoryUnit byte
+
+const (
+	UnitB MemoryUnit = iota
+	UnitK
+	UnitM
+	UnitG
+	UnitT
+)
+
+func (b MemoryUnit) String() string {
+	return []string{"", "Ki", "Mi", "Gi", "Ti", "Pi"}[int(b)]
+}
+
+func (b MemoryUnit) MarshalJSON() ([]byte, error) {
+	return []byte("\"" + b.String() + "\""), nil
+}
+
+func (b *MemoryUnit) UnmarshalJSON(data []byte) error {
+	var v string
+	json.Unmarshal(data, &v)
+	*b = map[string]MemoryUnit{"": UnitB, "Ki": UnitK, "Mi": UnitM, "Gi": UnitG, "Ti": UnitT}[v]
+	return nil
 }
 
 type RestService struct {
@@ -216,12 +243,30 @@ func (s RestService) jobDetail(projectName, jobNumber string, w http.ResponseWri
 	}
 
 	status := b.Status()
+	artifactSize := float64(-1)
+	artifactUnit := UnitB
 	if s.c.IsBeingBuilt(b) {
 		status = InProgress
+	} else {
+		artifactSize, artifactUnit = tidyUnit(b.ArtifactSize(), 0)
 	}
 
 	output, _ := b.ReadOutput()
 
 	e := json.NewEncoder(w)
-	e.Encode(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: output})
+	e.Encode(DomainJob{Name: b.name, Status: status, StartDate: b.StartDate(), EndDate: b.EndDate(), Output: output, ArtifactSize: artifactSize, ArtifactUnit: artifactUnit})
+}
+
+func tidyUnit(value int64, start byte) (float64, MemoryUnit) {
+	result := float64(value)
+	resultUnit := MemoryUnit(start)
+	for i := start; i < 5; i++ {
+		if val := result / 1024; val < 1 {
+			break
+		} else {
+			result = val
+			resultUnit = MemoryUnit(i + 1)
+		}
+	}
+	return result, resultUnit
 }
