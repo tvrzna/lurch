@@ -38,7 +38,7 @@ function initApp(name) {
 			}, 3000);
 		};
 
-		context.loadHistory = (suppressOpen) => {
+		context.loadHistory = (suppressOpen, suppressReload) => {
 			context.addLoading();
 			$.get(appUrl + "/projects/" + context.projectName, {
 				success: data => {
@@ -51,7 +51,7 @@ function initApp(name) {
 							rootEl.attr('class', 'project job-status-' + context.history[0].status + (rootEl.hasClass('maximized') ? ' maximized': ''));
 						}
 						context.status = context.history[0].status;
-						context.showJob(undefined, context.history[0].name);
+						context.showJob(undefined, context.history[0].name, undefined, undefined, suppressReload);
 						if (context.status == "inprogress" && !suppressOpen) {
 							context.setOutputCollapsed(false);
 						}
@@ -185,7 +185,7 @@ function initApp(name) {
 						msg += ' with parameters'
 					}
 					context.showMessage('info', msg);
-					setTimeout(() => {context.loadHistory();}, 100);
+					setTimeout(() => {context.loadHistory(undefined, true);}, 100);
 				},
 				error: () => {
 					context.showMessage('error', 'Could not ' + actionName + ' ' + context.projectName);
@@ -245,7 +245,7 @@ function initApp(name) {
 			}
 		}
 
-		context.showJob = (event, jobNo, el, hideLoading) => {
+		context.showJob = (event, jobNo, el, hideLoading, suppressReload) => {
 			if (event != undefined) {
 				event.preventDefault();
 				event.stopPropagation();
@@ -257,11 +257,11 @@ function initApp(name) {
 			$.get(appUrl + "/jobs/" + context.projectName + "/" + jobNo, {
 				success: data => {
 					var job = JSON.parse(data);
-					if (job.status == "inprogress") {
+					if (job.status == "inprogress" && suppressReload == undefined) {
 						setTimeout(() => {
 							context.showJob(event, jobNo, undefined, true);
 						}, 1000);
-					} else if (context.selectedJob != undefined && context.selectedJob.status == "inprogress" && job.status != "inprogress") {
+					} else if (context.selectedJob != undefined && context.selectedJob.status == "inprogress" && job.status != "inprogress" && !suppressReload) {
 						context.loadHistory();
 					}
 					context.selectedJob = job;
