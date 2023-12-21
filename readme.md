@@ -58,6 +58,7 @@ make clean build
 - [X] Hide dot project (e.g. `.ignored-project`) (0.3.0)
 - [X] Dark theme (0.3.0)
 - [X] Custom name of application (0.3.0)
+- [X] Synchronization of UI via WebSockets
 - [ ] Periodical watcher (running custom script saving state of last check)
 - [ ] Pipelining (jobs started according the result status)
 - [X] Starting build from build script

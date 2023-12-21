@@ -18,6 +18,7 @@ func TestContext(t *testing.T) {
 	conf := LoadConfig([]string{"-t", tmpdir})
 
 	c := NewContext(conf)
+	NewWebSocketService(c)
 
 	p1 := c.OpenProject("project-1")
 	if err = os.MkdirAll(p1.dir, 0755); err != nil {

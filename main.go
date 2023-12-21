@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"golang.org/x/net/websocket"
 )
 
 func main() {
@@ -23,6 +25,7 @@ func main() {
 func runWebServer(c *Context) {
 	mux := http.NewServeMux()
 
+	mux.Handle("/ws/", websocket.Handler(NewWebSocketService(c).HandleWebSocket))
 	mux.HandleFunc("/rest/", (&RestService{c: c}).HandleFunc)
 	mux.HandleFunc("/", NewWebService(c).HandleFunc)
 	c.webServer = &http.Server{Handler: mux, Addr: c.conf.getServerUri()}

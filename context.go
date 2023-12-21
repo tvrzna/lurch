@@ -23,6 +23,7 @@ type Context struct {
 	conf      *Config
 	jobs      []*Job
 	webServer *http.Server
+	wsService *WsService
 }
 
 // Init new context
@@ -113,6 +114,7 @@ func (c *Context) start(b *Job) {
 
 	cmd.Start()
 	go c.watchForInterrupt(b, cmd)
+	c.broadcastUpdate(b)
 
 	if err := cmd.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
@@ -136,6 +138,7 @@ func (c *Context) start(b *Job) {
 		log.Print("-- could not compress", b.WorkspacePath())
 	}
 	os.RemoveAll(b.WorkspacePath())
+	c.broadcastUpdate(b)
 
 	log.Printf("<< finished job #%s for %s", b.name, b.p.name)
 }
@@ -183,6 +186,7 @@ func (c *Context) watchForInterrupt(b *Job, cmd *exec.Cmd) {
 	if status {
 		b.SetStatus(Stopped)
 		cmd.Process.Signal(os.Kill)
+		c.broadcastUpdate(b)
 	}
 }
 
@@ -316,4 +320,8 @@ func (c *Context) compressFolder(outputPath, inputPath string) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Context) broadcastUpdate(b *Job) {
+	c.wsService.Broadcast(fmt.Sprintf("{\"update\": \"%s\"}", b.p.name))
 }

@@ -38,7 +38,7 @@ function initApp(name) {
 			}, 3000);
 		};
 
-		context.loadHistory = () => {
+		context.loadHistory = (suppressOpen) => {
 			context.addLoading();
 			$.get(appUrl + "/projects/" + context.projectName, {
 				success: data => {
@@ -52,7 +52,7 @@ function initApp(name) {
 						}
 						context.status = context.history[0].status;
 						context.showJob(undefined, context.history[0].name);
-						if (context.status == "inprogress") {
+						if (context.status == "inprogress" && !suppressOpen) {
 							context.setOutputCollapsed(false);
 						}
 					}
@@ -421,14 +421,34 @@ function initApp(name) {
 	app.attribute('ajsf-href', (el, value) => {
 		$(el).attr('href', value);
 	});
+
+	return app;
 }
+
+const appMap = new Map();
 
 $('[ajsf]').each((i, el) => {
 	var appName = $(el).attr('ajsf');
 	if (appName != "lurch-settings") {
-		initApp(appName);
+		appMap.set(appName, initApp(appName));
 	}
 });
+
+function connectToWs() {
+	wsUrl = 'ws://' + window.location.host + window.location.pathname + 'ws/';
+	const socket = new WebSocket(wsUrl);
+	socket.addEventListener("message", (event) => {
+		let msg = JSON.parse(event.data);
+		let updateApp = msg["update"];
+		if (updateApp !== undefined) {
+			let app = appMap.get(updateApp);
+			app.context.loadHistory(true);
+		}
+	});
+	socket.addEventListener("close", () => {
+		setTimeout(connectToWs, 1000);
+	});
+}
 
 ajsf("lurch-settings", context => {
 	const themeItemName = "lurch.theme";
@@ -448,4 +468,6 @@ ajsf("lurch-settings", context => {
 	};
 
 	context.setTheme(localStorage.getItem(themeItemName));
+
+	connectToWs();
 });
