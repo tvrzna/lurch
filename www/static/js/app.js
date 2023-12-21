@@ -435,7 +435,7 @@ $('[ajsf]').each((i, el) => {
 });
 
 function connectToWs() {
-	wsUrl = 'ws://' + window.location.host + window.location.pathname + 'ws/';
+	wsUrl = (window.location.protocol == 'https:' ? 'wss://' : 'ws://') + window.location.host + window.location.pathname + 'ws/';
 	const socket = new WebSocket(wsUrl);
 	socket.addEventListener("message", (event) => {
 		let msg = JSON.parse(event.data);
