@@ -14,10 +14,13 @@ var buildVersion string
 const delimiter = "="
 
 type Config struct {
+	client bool
 	port   int
 	appUrl string
 	path   string
 	name   string
+	action socketAction
+	data   string
 }
 
 func LoadConfig(args []string) *Config {
@@ -33,8 +36,12 @@ func LoadConfig(args []string) *Config {
 			c.appUrl = value
 		case "-n", "--name":
 			c.name = value
+		case "-sj", "--start-job":
+			c.client = true
+			c.action = socketActionStart
+			c.data = value
 		case "-h", "--help":
-			fmt.Printf("Usage: lurch [options]\nOptions:\n\t-h, --help\t\t\tprint this help\n\t-v, --version\t\t\tprint version\n\t-t, --path [PATH]\t\tabsolute path to work dir\n\t-p, --port [PORT]\t\tsets port for listening\n\t-a, --app-url [APP_URL]\t\tapplication url (if behind proxy)\n\t-n, --name [NAME]\t\tname of application to be displayed\n")
+			fmt.Printf("Usage: lurch [options]\nOptions:\n\t-h, --help\t\t\tprint this help\n\t-v, --version\t\t\tprint version\n\t-t, --path [PATH]\t\tabsolute path to work dir\n\t-p, --port [PORT]\t\tsets port for listening\n\t-a, --app-url [APP_URL]\t\tapplication url (if behind proxy)\n\t-n, --name [NAME]\t\tname of application to be displayed\n\t-sj, --start-job [PROJECT]\tmakes client call to origin server and starts the build of [PROJECT]\n")
 			os.Exit(0)
 		case "-v", "--version":
 			fmt.Printf("lurch %s\nhttps://github.com/tvrzna/lurch\n\nReleased under the MIT License.\n", c.GetVersion())

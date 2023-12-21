@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math/rand"
 	"os"
 	"regexp"
 	"strings"
@@ -60,4 +61,15 @@ func loadParams(path string) map[string]string {
 		}
 	}
 	return result
+}
+
+// Generates random token of defined length
+func randomToken(n int) string {
+	var letterRunes = []rune("0123456789abcdefghijklmnopqrstuvwxyz")
+
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }

@@ -92,7 +92,12 @@ func (c *Context) start(b *Job) {
 	b.p.SetParams(b.params)
 	b.p.SaveParams()
 
-	c.setEnv(cmd, b)
+	socket := startServerSocket(c, b)
+	if socket != nil {
+		defer socket.stop()
+	}
+
+	c.setEnv(cmd, b, socket)
 	cmd.Dir = b.WorkspacePath()
 	output, err := os.OpenFile(b.OutputPath(), os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
@@ -135,13 +140,18 @@ func (c *Context) start(b *Job) {
 	log.Printf("<< finished job #%s for %s", b.name, b.p.name)
 }
 
-func (c *Context) setEnv(cmd *exec.Cmd, b *Job) {
+func (c *Context) setEnv(cmd *exec.Cmd, b *Job, socket *socketServerContext) {
 	envs := os.Environ()
 
 	if b.params != nil {
 		for k, v := range b.params {
 			envs = append(envs, fmt.Sprintf("%s=%s", k, v))
 		}
+	}
+
+	if socket != nil {
+		envs = append(envs, fmt.Sprintf("%s=%d", envSocketPort, socket.port))
+		envs = append(envs, fmt.Sprintf("%s=%s", envSocketToken, socket.token))
 	}
 
 	cmd.Env = envs

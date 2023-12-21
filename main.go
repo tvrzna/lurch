@@ -11,6 +11,10 @@ import (
 func main() {
 	c := NewContext(LoadConfig(os.Args))
 
+	if c.conf.client {
+		os.Exit(makeSocketClientAction(c.conf.action, c.conf.data))
+	}
+
 	go runWebServer(c)
 
 	handleStop(c)
