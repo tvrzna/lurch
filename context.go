@@ -165,6 +165,8 @@ func (c *Context) removeFromSlice(b *Job) {
 	if index := c.indexOf(b); index >= 0 {
 		if len(c.jobs) == 1 {
 			c.jobs = c.jobs[:0]
+		} else if index+1 == len(c.jobs) {
+			c.jobs = c.jobs[:index]
 		} else {
 			c.jobs = append(c.jobs[:index], c.jobs[index+1])
 		}

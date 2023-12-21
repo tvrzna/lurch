@@ -53,6 +53,8 @@ func (w *WsService) removeFromSlice(wsCon *WsConnection) {
 	if index := w.indexOf(wsCon); index >= 0 {
 		if len(w.cons) == 1 {
 			w.cons = w.cons[:0]
+		} else if index+1 == len(w.cons) {
+			w.cons = w.cons[:index]
 		} else {
 			w.cons = append(w.cons[:index], w.cons[index+1])
 		}
